@@ -10,7 +10,7 @@
 1. Download `VSQ.ahk` to your desired folder
 2. **Either:** Place VSQ.ahk with `Kesmai.Client.exe`, OR update `GamePath` in `VSQ_Config.ini`
 3. Run `VSQ.ahk` - it creates `VSQ_Config.ini` automatically
-4. Configure settings via hotkeys or config file
+4. **Configure settings:** Press **Ctrl+Shift+~** to open the Configuration GUI for easy setup, or manually edit `VSQ_Config.ini`
 
 ### 🎯 **Important:** VSQ as Game Launcher
 - **Run `VSQ.ahk` instead of launching the game directly** - VSQ can automatically launch the game for you
