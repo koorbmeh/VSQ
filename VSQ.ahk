@@ -571,15 +571,24 @@ ClickLoginButton() {
         return
     }
     
-    ; Click relative to the game window using button down/up events
+    ; Click at the coordinates (stored as relative coordinates - multi-monitor safe)
     if (WinExist(GameWindowTitle)) {
-        LogMessage("Clicking login button at relative coordinates " . LoginButtonX . "," . LoginButtonY . " within game window")
+        ; Get window position and convert to absolute coordinates for SendClick
+        WinGetPos(&winX, &winY, &winWidth, &winHeight, GameWindowTitle)
+        absoluteX := winX + LoginButtonX
+        absoluteY := winY + LoginButtonY
         
-        ; Move mouse to coordinates first, then click (login screen needs this approach)
-        MouseMove(LoginButtonX, LoginButtonY)
-        Sleep(ShortDelay)  ; Brief delay to ensure UI registers mouse position
-        SendClick("Left", 0)  ; Click at current mouse position
-        LogMessage("Login button click sequence completed")
+        LogMessage("Game window at " . winX . "," . winY . " size " . winWidth . "x" . winHeight)
+        LogMessage("Login button relative coordinates: " . LoginButtonX . "," . LoginButtonY)
+        LogMessage("Converted to absolute coordinates: " . absoluteX . "," . absoluteY)
+        
+        ; Use SendClick with absolute coordinates (handles button down/up properly)
+        LogMessage("Sending click to " . absoluteX . "," . absoluteY)
+        if (SendClick("Left", 0, absoluteX, absoluteY)) {
+            LogMessage("Login button click completed successfully")
+        } else {
+            LogMessage("Login button click failed")
+        }
     } else {
         LogMessage("Game window not found - cannot click login button")
     }
@@ -2103,11 +2112,26 @@ SetActiveSpellCoordinates(areaType) {
 
 ; Ctrl+Shift+L - Set login button coordinates
 ^+l::{
-    global GUIOpen, ConfigGUI
+    global GUIOpen, ConfigGUI, GameWindowTitle
     
+    ; Get absolute mouse position
     MouseGetPos(&mouseX, &mouseY)
-    LoginButtonX := mouseX
-    LoginButtonY := mouseY
+    
+    ; Check if game window exists and get its position
+    if (WinExist(GameWindowTitle)) {
+        WinGetPos(&winX, &winY, &winWidth, &winHeight, GameWindowTitle)
+        
+        ; Convert to relative coordinates within the game window
+        LoginButtonX := mouseX - winX
+        LoginButtonY := mouseY - winY
+        
+        LogMessage("Captured relative coordinates " . LoginButtonX . "," . LoginButtonY . " (absolute: " . mouseX . "," . mouseY . ", window: " . winX . "," . winY . ")")
+    } else {
+        ; If game window not found, store as absolute coordinates
+        LoginButtonX := mouseX
+        LoginButtonY := mouseY
+        LogMessage("Game window not found - storing absolute coordinates " . LoginButtonX . "," . LoginButtonY)
+    }
     
     ; Save to config file
     IniWrite(LoginButtonX, ConfigFile, "GAME SETTINGS", "LoginButtonX")
