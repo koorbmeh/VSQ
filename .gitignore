@@ -1,0 +1,5 @@
+# Ignore everything except VSQ.ahk and README.md
+*
+!VSQ.ahk
+!README.md
+!.gitignore
