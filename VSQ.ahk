@@ -2,16 +2,16 @@
 ; Download here: https://www.autohotkey.com/download/ahk-v2.exe
 
 ; ========================================
-; VSQ.ahk - Vyris's Stormhalter QoL Improvements
+; VSQ.ahk - Vyris's Stormhalter QoL Improvement Mod
 ; ========================================
 ; All user-configurable settings are in VSQ_Config.ini
-; The VSQ_Config.ini is created after running VSQ the first time.
+; The VSQ_Config.ini is created after running the script the first time.
 ; ========================================
 
 ; ========================================
 ; 1. GLOBAL VARIABLES
 ; ========================================
-; These variables are managed by VSQ and should not be edited manually
+; These variables are managed by the script and should not be edited manually
 
 ConfigFile := "VSQ_Config.ini"
 LogFile := "VSQ_Debug.log"
@@ -38,7 +38,6 @@ ShortDelay := 32
 MediumDelay := 64
 LongDelay := 128
 TooltipDisplayTime := 2048
-LongTooltipDisplayTime := 15000
 AutoLoopInterval := 100
 CoinRoundTimerDelay := 1064
 LoginDelay := 200
@@ -73,7 +72,7 @@ Profile9Name := "Profile 9"
 ; Note: These are loaded/saved per profile, but stored as global variables for current profile
 
 ; Auto settings
-EnableAuto := false  ; VSQ-only variable, controlled by Middle Click
+EnableAuto := false  ; Script-only variable, controlled by Middle Click
 EnableHealthMonitoring := true
 EnableManaMonitoring := true
 AttackKey1 := ""
@@ -137,9 +136,6 @@ EnableCreatureListVerification := false
 CritListVerifyX := 0
 CritListVerifyY := 0
 
-; ========================================
-; CURSOR SETTINGS
-; ========================================
 ReadyCursorHashes := []  ; Array of hashes for "ready" cursors (populate via hotkey)
 
 ; ========================================
@@ -150,7 +146,7 @@ ReadyCursorHashes := []  ; Array of hashes for "ready" cursors (populate via hot
 LoadConfig(profileToLoad := "") {
     global ConfigFile
     global GamePath, GameExecutable, AutoClickLogin, LoginButtonX, LoginButtonY, UseSecondaryMonitor, SecondaryMonitorNumber, AutoMaximizeWindow, BackupFolder
-    global ShortDelay, MediumDelay, LongDelay, TooltipDisplayTime, LongTooltipDisplayTime, AutoLoopInterval, CoinRoundTimerDelay, LoginDelay, MouseClickCooldown, GameMonitorInterval, EnableDebugLogging, EnableBackups, BackupConfigOnly
+    global ShortDelay, MediumDelay, LongDelay, TooltipDisplayTime, AutoLoopInterval, CoinRoundTimerDelay, LoginDelay, MouseClickCooldown, GameMonitorInterval, EnableDebugLogging, EnableBackups, BackupConfigOnly
     global MaxProfiles, CurrentProfile, Profile1Name, Profile2Name, Profile3Name, Profile4Name, Profile5Name, Profile6Name, Profile7Name, Profile8Name, Profile9Name
     global EnableAuto, EnableHealthMonitoring, EnableManaMonitoring, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, DrinkKey, HealthAreaX, HealthAreaY, ManaAreaX, ManaAreaY, CreatureAreaX, CreatureAreaY, EnableMASkill, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, CoinRoundTimerDelay, EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY, ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey, MainHandX, MainHandY, OffHandX, OffHandY, EnableCreatureListVerification, CritListVerifyX, CritListVerifyY
     global ReadyCursorHashes
@@ -179,7 +175,6 @@ LoadConfig(profileToLoad := "") {
         MediumDelay := IniRead(ConfigFile, "TIMING SETTINGS", "MediumDelay", MediumDelay)
         LongDelay := IniRead(ConfigFile, "TIMING SETTINGS", "LongDelay", LongDelay)
         TooltipDisplayTime := IniRead(ConfigFile, "TIMING SETTINGS", "TooltipDisplayTime", TooltipDisplayTime)
-        LongTooltipDisplayTime := IniRead(ConfigFile, "TIMING SETTINGS", "LongTooltipDisplayTime", LongTooltipDisplayTime)
         AutoLoopInterval := IniRead(ConfigFile, "TIMING SETTINGS", "AutoLoopInterval", AutoLoopInterval)
         CoinRoundTimerDelay := IniRead(ConfigFile, "TIMING SETTINGS", "CoinRoundTimerDelay", CoinRoundTimerDelay)
         LoginDelay := IniRead(ConfigFile, "TIMING SETTINGS", "LoginDelay", LoginDelay)
@@ -238,12 +233,12 @@ CreateDefaultConfig() {
     global ConfigFile
     
     defaultConfig := "; VSQ Configuration File`n"
-    defaultConfig .= "; Edit these settings as needed - do not edit VSQ.ahk`n"
+    defaultConfig .= "; Edit these settings as needed - do not edit the main script`n"
     defaultConfig .= "; *** IMPORTANT SETUP INSTRUCTIONS ***`n"
     defaultConfig .= "; You MUST either:`n"
     defaultConfig .= "; 1) Update the GamePath below to point to your Stormhalter folder, OR`n"
-    defaultConfig .= "; 2) Place VSQ.ahk in the same folder as Kesmai.Client.exe`n"
-    defaultConfig .= "; VSQ will automatically check both locations`n`n"
+    defaultConfig .= "; 2) Place this script in the same folder as Kesmai.Client.exe`n"
+    defaultConfig .= "; The script will automatically check both locations`n`n"
     
     defaultConfig .= "[GAME SETTINGS]`n"
     defaultConfig .= "GamePath=C:\Program Files\Stormhalter\`n"
@@ -261,7 +256,6 @@ CreateDefaultConfig() {
     defaultConfig .= "MediumDelay=64`n"
     defaultConfig .= "LongDelay=128`n"
     defaultConfig .= "TooltipDisplayTime=2048`n"
-    defaultConfig .= "LongTooltipDisplayTime=15000`n"
     defaultConfig .= "AutoLoopInterval=128`n"
     defaultConfig .= "CoinRoundTimerDelay=1064`n"
     defaultConfig .= "LoginDelay=200`n"
@@ -358,10 +352,6 @@ CreateDefaultConfig() {
 ; 3. UTILITY FUNCTIONS
 ; ========================================
 
-; ========================================
-; 3.1 LOGGING FUNCTIONS
-; ========================================
-
 ; Function to log messages with timestamp
 LogMessage(message) {
     global LogFile, EnableDebugLogging
@@ -389,7 +379,7 @@ LogMessage(message) {
 ; 3.2 BACKUP FUNCTIONS
 ; ========================================
 
-; Function to create backup of VSQ.ahk and/or config
+; Function to create backup of script and/or config
 CreateBackup() {
     global BackupFolder, ConfigFile, EnableBackups, BackupConfigOnly
     
@@ -408,11 +398,11 @@ CreateBackup() {
         
         backupFiles := []
         
-        ; Backup VSQ.ahk (unless config-only mode)
+        ; Backup script file (unless config-only mode)
         if (!BackupConfigOnly) {
-            vsqBackup := BackupFolder . "\VSQ_Backup_" . timestamp . ".ahk"
-            FileCopy(A_ScriptFullPath, vsqBackup)
-            backupFiles.Push(vsqBackup)
+            scriptBackup := BackupFolder . "\VSQ_Backup_" . timestamp . ".ahk"
+            FileCopy(A_ScriptFullPath, scriptBackup)
+            backupFiles.Push(scriptBackup)
         }
         
         ; Backup config file if it exists
@@ -465,18 +455,18 @@ LaunchGame() {
         if (!FileExist(fullPath)) {
             LogMessage("Game executable not found at configured path: " . fullPath)
             
-            ; Check if the executable is in the same folder as VSQ.ahk
-            vsqDir := A_ScriptDir . "\"
-            vsqPath := vsqDir . GameExecutable
-            LogMessage("Checking VSQ directory: " . vsqPath)
+            ; Check if the executable is in the same folder as the script
+            scriptDir := A_ScriptDir . "\"
+            scriptPath := scriptDir . GameExecutable
+            LogMessage("Checking script directory: " . scriptPath)
             
-            if (FileExist(vsqPath)) {
-                LogMessage("Found game executable in same directory, using that instead")
-                fullPath := vsqPath
-                GamePath := vsqDir
+            if (FileExist(scriptPath)) {
+                LogMessage("Found game executable in script directory, using that instead")
+                fullPath := scriptPath
+                GamePath := scriptDir
             } else {
                 LogMessage("Error: Game executable not found at either location")
-                LogMessage("Checked paths: " . fullPath . " and " . vsqPath)
+                LogMessage("Checked paths: " . fullPath . " and " . scriptPath)
                 return false
             }
         }
@@ -502,7 +492,6 @@ LaunchGame() {
             
             ; Auto-click login if configured
             if (AutoClickLogin) {
-                Sleep(LoginDelay)
                 ClickLoginButton()
             }
             
@@ -564,31 +553,24 @@ MoveToSecondaryMonitor() {
 
 ; Function to click login button
 ClickLoginButton() {
-    global LoginButtonX, LoginButtonY, GameWindowTitle
+    global LoginButtonX, LoginButtonY, GameWindowTitle, LongDelay
     
     if (LoginButtonX = 0 && LoginButtonY = 0) {
         LogMessage("Login button coordinates not set - use Ctrl+Shift+L to set them")
         return
     }
     
-    ; Click at the coordinates (stored as relative coordinates - multi-monitor safe)
+    ; Click relative to the game window using button down/up events
     if (WinExist(GameWindowTitle)) {
-        ; Get window position and convert to absolute coordinates for SendClick
-        WinGetPos(&winX, &winY, &winWidth, &winHeight, GameWindowTitle)
-        absoluteX := winX + LoginButtonX
-        absoluteY := winY + LoginButtonY
+        LogMessage("Clicking login button at relative coordinates " . LoginButtonX . "," . LoginButtonY . " within game window")
         
-        LogMessage("Game window at " . winX . "," . winY . " size " . winWidth . "x" . winHeight)
-        LogMessage("Login button relative coordinates: " . LoginButtonX . "," . LoginButtonY)
-        LogMessage("Converted to absolute coordinates: " . absoluteX . "," . absoluteY)
+        ; Move mouse to coordinates first, then click (login screen needs this approach)
         
-        ; Use SendClick with absolute coordinates (handles button down/up properly)
-        LogMessage("Sending click to " . absoluteX . "," . absoluteY)
-        if (SendClick("Left", 0, absoluteX, absoluteY)) {
-            LogMessage("Login button click completed successfully")
-        } else {
-            LogMessage("Login button click failed")
-        }
+        WinActivate(GameWindowTitle)
+        MouseMove(LoginButtonX, LoginButtonY)
+        Sleep(LongDelay)  ; Brief delay to ensure UI registers mouse position
+        SendClick("Left", 0, LoginButtonX, LoginButtonY)  ; Click at current mouse position
+        LogMessage("Login button click sequence completed")
     } else {
         LogMessage("Game window not found - cannot click login button")
     }
@@ -625,14 +607,14 @@ CheckMouseButtons() {
     lastMiddleState := currentMiddleState
 }
 
-; Function to monitor game window and exit VSQ if game closes
+; Function to monitor game window and exit script if game closes
 MonitorGameWindow() {
     global GameRunning, GameWindowTitle, EnableActiveSpellScrolling, LastMouseClickTime, GUIOpen
     
     if (WinExist(GameWindowTitle)) {
         if (!GameRunning) {
             GameRunning := true
-            LogMessage("Game window detected - VSQ ready")
+            LogMessage("Game window detected - script ready")
         }
         
         ; Check active spell scrolling if enabled
@@ -651,10 +633,10 @@ MonitorGameWindow() {
             GameRunning := false
             ; Only exit if GUI is not open
             if (!GUIOpen) {
-                LogMessage("Game window closed - exiting VSQ")
+                LogMessage("Game window closed - exiting script")
                 ExitApp()
             } else {
-                LogMessage("Game window closed - but GUI is open, VSQ continues running")
+                LogMessage("Game window closed - but GUI is open, script continues running")
             }
         }
     }
@@ -902,7 +884,6 @@ RestoreProfileDefaults(profileNumber) {
         IniWrite("64", ConfigFile, "TIMING SETTINGS", "MediumDelay")
         IniWrite("128", ConfigFile, "TIMING SETTINGS", "LongDelay")
         IniWrite("2048", ConfigFile, "TIMING SETTINGS", "TooltipDisplayTime")
-        IniWrite("15000", ConfigFile, "TIMING SETTINGS", "LongTooltipDisplayTime")
         IniWrite("128", ConfigFile, "TIMING SETTINGS", "AutoLoopInterval")
         IniWrite("1064", ConfigFile, "TIMING SETTINGS", "CoinRoundTimerDelay")
         IniWrite("200", ConfigFile, "TIMING SETTINGS", "LoginDelay")
@@ -1368,7 +1349,7 @@ SaveCursorHashes() {
 ; ========================================
 ; 3.7 GDI+ FUNCTIONS (MINIMAL SET)
 ; ========================================
-; Only the functions actually used by VSQ are included below
+; Only the functions actually used by the script are included below
 
 ; Helper function for Gdip_LockBits
 CreateRect(&Rect, x, y, w, h)
@@ -2112,26 +2093,11 @@ SetActiveSpellCoordinates(areaType) {
 
 ; Ctrl+Shift+L - Set login button coordinates
 ^+l::{
-    global GUIOpen, ConfigGUI, GameWindowTitle
+    global GUIOpen, ConfigGUI
     
-    ; Get absolute mouse position
     MouseGetPos(&mouseX, &mouseY)
-    
-    ; Check if game window exists and get its position
-    if (WinExist(GameWindowTitle)) {
-        WinGetPos(&winX, &winY, &winWidth, &winHeight, GameWindowTitle)
-        
-        ; Convert to relative coordinates within the game window
-        LoginButtonX := mouseX - winX
-        LoginButtonY := mouseY - winY
-        
-        LogMessage("Captured relative coordinates " . LoginButtonX . "," . LoginButtonY . " (absolute: " . mouseX . "," . mouseY . ", window: " . winX . "," . winY . ")")
-    } else {
-        ; If game window not found, store as absolute coordinates
-        LoginButtonX := mouseX
-        LoginButtonY := mouseY
-        LogMessage("Game window not found - storing absolute coordinates " . LoginButtonX . "," . LoginButtonY)
-    }
+    LoginButtonX := mouseX
+    LoginButtonY := mouseY
     
     ; Save to config file
     IniWrite(LoginButtonX, ConfigFile, "GAME SETTINGS", "LoginButtonX")
@@ -2859,10 +2825,10 @@ CreateStartTab() {
     ; Backup Settings
     ConfigGUI.AddGroupBox("x20 y382 w560 h173", "Backup Settings")
     ConfigGUI.AddCheckBox("x30 y402 w200 h20 vEnableBackupsCheckbox", "Enable Backups").OnEvent("Click", OnEnableBackupsChange)
-    ConfigGUI.AddText("x30 y427 w500 h20", "Automatically create backups of VSQ.ahk and config files.")
+    ConfigGUI.AddText("x30 y427 w500 h20", "Automatically create backups of the script and config files.")
     
     ConfigGUI.AddCheckBox("x30 y452 w200 h20 vBackupConfigOnlyCheckbox", "Backup Config Only")
-    ConfigGUI.AddText("x30 y477 w500 h20", "When enabled, only backup the config file (not VSQ.ahk).")
+    ConfigGUI.AddText("x30 y477 w500 h20", "When enabled, only backup the config file (not the script).")
     
     ConfigGUI.AddText("x30 y502 w200 h20", "Backup Folder:")
     ConfigGUI.AddEdit("x30 y522 w400 h20 vBackupFolderEdit", "")
@@ -2884,7 +2850,7 @@ CreateTimingTab() {
     TabControl.UseTab(2)
     
     ; Timing Settings
-    ConfigGUI.AddGroupBox("x20 y65 w560 h325", "Timing Settings")
+    ConfigGUI.AddGroupBox("x20 y65 w560 h295", "Timing Settings")
     ConfigGUI.AddText("x30 y90 w200 h20", "Short Delay (ms):")
     ConfigGUI.AddEdit("x200 y87 w80 h20 vShortDelay")
     ConfigGUI.AddText("x290 y90 w250 h20", "Short delay for local actions")
@@ -2901,29 +2867,26 @@ CreateTimingTab() {
     ConfigGUI.AddEdit("x200 y177 w80 h20 vTooltipDisplayTime")
     ConfigGUI.AddText("x290 y180 w250 h20", "Standard tooltop display")
     
-    ConfigGUI.AddText("x30 y210 w200 h20", "Long Tooltip Display Time (ms):")
-    ConfigGUI.AddEdit("x200 y207 w80 h20 vLongTooltipDisplayTime")
-    ConfigGUI.AddText("x290 y210 w250 h20", "Tooltip display duration for reference content")
     
-    ConfigGUI.AddText("x30 y240 w200 h20", "Auto Loop Interval (ms):")
-    ConfigGUI.AddEdit("x200 y237 w80 h20 vAutoLoopInterval")
-    ConfigGUI.AddText("x290 y240 w250 h20", "Auto loop repeat interval")
+    ConfigGUI.AddText("x30 y210 w200 h20", "Auto Loop Interval (ms):")
+    ConfigGUI.AddEdit("x200 y207 w80 h20 vAutoLoopInterval")
+    ConfigGUI.AddText("x290 y210 w250 h20", "Auto loop repeat interval")
     
-    ConfigGUI.AddText("x30 y270 w200 h20", "Round Timer Delay (ms):")
-    ConfigGUI.AddEdit("x200 y267 w80 h20 vCoinRoundTimerDelay")
-    ConfigGUI.AddText("x290 y270 w250 h20", "One round")
+    ConfigGUI.AddText("x30 y240 w200 h20", "Round Timer Delay (ms):")
+    ConfigGUI.AddEdit("x200 y237 w80 h20 vCoinRoundTimerDelay")
+    ConfigGUI.AddText("x290 y240 w250 h20", "One round")
     
-    ConfigGUI.AddText("x30 y300 w200 h20", "Login Delay (ms):")
-    ConfigGUI.AddEdit("x200 y297 w80 h20 vLoginDelay")
-    ConfigGUI.AddText("x290 y300 w250 h20", "Delay before auto-clicking login button")
+    ConfigGUI.AddText("x30 y270 w200 h20", "Login Delay (ms):")
+    ConfigGUI.AddEdit("x200 y267 w80 h20 vLoginDelay")
+    ConfigGUI.AddText("x290 y270 w250 h20", "Delay before auto-clicking login button")
     
-    ConfigGUI.AddText("x30 y330 w200 h20", "Mouse Click Cooldown (ms):")
-    ConfigGUI.AddEdit("x200 y327 w80 h20 vMouseClickCooldown")
-    ConfigGUI.AddText("x290 y330 w250 h20", "Delay after click before spell bar auto-scroll starts")
+    ConfigGUI.AddText("x30 y300 w200 h20", "Mouse Click Cooldown (ms):")
+    ConfigGUI.AddEdit("x200 y297 w80 h20 vMouseClickCooldown")
+    ConfigGUI.AddText("x290 y300 w250 h20", "Delay after click before spell bar auto-scroll starts")
     
-    ConfigGUI.AddText("x30 y360 w200 h20", "Game Monitor Interval (ms):")
-    ConfigGUI.AddEdit("x200 y357 w80 h20 vGameMonitorInterval")
-    ConfigGUI.AddText("x290 y360 w250 h20", "Game window check frequency")
+    ConfigGUI.AddText("x30 y330 w200 h20", "Game Monitor Interval (ms):")
+    ConfigGUI.AddEdit("x200 y327 w80 h20 vGameMonitorInterval")
+    ConfigGUI.AddText("x290 y330 w250 h20", "Game window check frequency")
     
 }
 
@@ -3115,7 +3078,7 @@ CreateHotkeysTab() {
     
     ; Note about hotkey customization
     ConfigGUI.AddText("x20 y335 w540 h20", "Note: Hotkeys are hardcoded and cannot be customized through the GUI.")
-    ConfigGUI.AddText("x20 y365 w540 h20", "To change hotkeys, edit VSQ.ahk directly.")
+    ConfigGUI.AddText("x20 y365 w540 h20", "To change hotkeys, edit the script file directly.")
 }
 
 
@@ -3123,7 +3086,7 @@ CreateHotkeysTab() {
 
 ; Save all settings from all tabs
 RestoreDefaults(*) {
-    global ConfigGUI, CurrentProfile, ConfigFile, GetProfileName
+    global ConfigGUI, CurrentProfile, ConfigFile, GetProfileName, TooltipDisplayTime
     
     if (!ConfigGUI || !ConfigGUI.Hwnd) {
         return
@@ -3148,7 +3111,6 @@ RestoreDefaults(*) {
         MediumDelay := 64
         LongDelay := 128
         TooltipDisplayTime := 2048
-        LongTooltipDisplayTime := 15000
         AutoLoopInterval := 128
         CoinRoundTimerDelay := 1064
         LoginDelay := 200
@@ -3169,7 +3131,7 @@ RestoreDefaults(*) {
         
     } catch Error as e {
         ToolTip("Error restoring defaults: " . e.Message, , , 21)
-        SetTimer(() => ToolTip(, , , 21), -LongTooltipDisplayTime)
+        SetTimer(() => ToolTip(, , , 21), -TooltipDisplayTime)
         LogMessage("Error restoring defaults: " . e.Message)
     }
 }
@@ -3241,7 +3203,7 @@ LoadProfileToGUI() {
     global CoinAreaBottomRightX, CoinAreaBottomRightY, MoneyRingKey, EnableCreatureListVerification
     global CritListVerifyX, CritListVerifyY, EnableHealthMonitoring, EnableManaMonitoring, AttackSpamReduction
     global AutoClickLogin, GamePath, BackupFolder, EnableBackups, BackupConfigOnly, EnableDebugLogging
-    global ShortDelay, MediumDelay, LongDelay, TooltipDisplayTime, LongTooltipDisplayTime, AutoLoopInterval, CoinRoundTimerDelay, LoginDelay, MouseClickCooldown, GameMonitorInterval
+    global ShortDelay, MediumDelay, LongDelay, TooltipDisplayTime, AutoLoopInterval, CoinRoundTimerDelay, LoginDelay, MouseClickCooldown, GameMonitorInterval
     
     if (!ConfigGUI || !ConfigGUI.Hwnd) {
         return
@@ -3272,7 +3234,6 @@ LoadProfileToGUI() {
         ConfigGUI["MediumDelay"].Text := MediumDelay
         ConfigGUI["LongDelay"].Text := LongDelay
         ConfigGUI["TooltipDisplayTime"].Text := TooltipDisplayTime
-        ConfigGUI["LongTooltipDisplayTime"].Text := LongTooltipDisplayTime
         ConfigGUI["AutoLoopInterval"].Text := AutoLoopInterval
         ConfigGUI["CoinRoundTimerDelay"].Text := CoinRoundTimerDelay
         ConfigGUI["LoginDelay"].Text := LoginDelay
@@ -3705,7 +3666,7 @@ OnMARestockModeChange(Ctrl, *) {
 }
 
 SaveTimingTabSettings(*) {
-    global ConfigGUI, ShortDelay, MediumDelay, LongDelay, TooltipDisplayTime, LongTooltipDisplayTime, AutoLoopInterval, CoinRoundTimerDelay, LoginDelay, MouseClickCooldown, GameMonitorInterval, ConfigFile
+    global ConfigGUI, ShortDelay, MediumDelay, LongDelay, TooltipDisplayTime, AutoLoopInterval, CoinRoundTimerDelay, LoginDelay, MouseClickCooldown, GameMonitorInterval, ConfigFile
     
     if (!ConfigGUI || !ConfigGUI.Hwnd) {
         return
@@ -3732,10 +3693,6 @@ SaveTimingTabSettings(*) {
         IniWrite(TooltipDisplayTime, ConfigFile, "TIMING SETTINGS", "TooltipDisplayTime")
         LogMessage("TooltipDisplayTime saved as: " . TooltipDisplayTime)
         
-        ; Get and save LongTooltipDisplayTime
-        LongTooltipDisplayTime := ConfigGUI["LongTooltipDisplayTime"].Text
-        IniWrite(LongTooltipDisplayTime, ConfigFile, "TIMING SETTINGS", "LongTooltipDisplayTime")
-        LogMessage("LongTooltipDisplayTime saved as: " . LongTooltipDisplayTime)
         
         ; Get and save AutoLoopInterval
         AutoLoopInterval := ConfigGUI["AutoLoopInterval"].Text
@@ -3777,20 +3734,20 @@ CloseConfigGUI(*) {
         ConfigGUI.Destroy()
         GUIOpen := false
         
-        ; Check if game is running, if not, exit VSQ
+        ; Check if game is running, if not, exit the script
         if (!IsGameRunning()) {
-            LogMessage("GUI closed and game not running - exiting VSQ")
+            LogMessage("GUI closed and game not running - exiting script")
             ExitApp()
         } else {
-            ; Show a brief message that VSQ is still running
-            ToolTip("Configuration GUI closed. VSQ continues running in background.`nPress Ctrl+Shift+~ to reopen GUI.", 100, 100, 20)
+            ; Show a brief message that the script is still running
+            ToolTip("Configuration GUI closed. Script continues running in background.`nPress Ctrl+Shift+~ to reopen GUI.", 100, 100, 20)
             SetTimer(() => ToolTip("", 100, 100, 20), -TooltipDisplayTime)  ; Show for configured time
         }
     }
 }
 
 ; ========================================
-; 7. VSQ INITIALIZATION
+; 7. SCRIPT INITIALIZATION
 ; ========================================
 
 ; Load configuration first
@@ -3803,7 +3760,7 @@ if (!LoadConfig()) {
 ; Create backup after config is loaded (so debug logging setting is respected)
 CreateBackup()
 
-; Log VSQ startup
+; Log script startup
 LogMessage("VSQ started")
 
 pToken := Gdip_Startup()  ; Start GDI+
@@ -3818,7 +3775,7 @@ SetTimer(() => ToolTip(, , , 9), -TooltipDisplayTime)
 ; Check if game is already running
 if (IsGameRunning()) {
     GameRunning := true
-    LogMessage("Game already running - VSQ ready")
+    LogMessage("Game already running - script ready")
 } else {
     LogMessage("Game not running - attempting to launch")
     if (LaunchGame()) {

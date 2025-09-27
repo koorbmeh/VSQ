@@ -54,8 +54,8 @@
 | **Ctrl+Shift+G** | Set Creature list verification coordinates (green arrows) |
 | **Ctrl+Shift+P** | Toggle Creature list verification (on/off) |
 | **Ctrl+Shift+U/I** | Set Coin search area (top-left/bottom-right) |
-| **Ctrl+Shift+J/O** | Set Active spell scrolling arrow coordinates (left/right) |
-| **Ctrl+Shift+Q** | Set Active spell gone detection (right most spell spot on active spell bar) |
+| **Ctrl+Shift+J/O** | Set Active Spell scrolling coordinates (left/right arrows) |
+| **Ctrl+Shift+Q** | Set Active Spell Gone coordinates (dark when spell disappears) |
 | **Ctrl+Shift+V** | Set Warmed spell coordinates (dark when no spell is warmed) |
 | **Ctrl+Shift+F** | Set Main Hand coordinates (dark when fumbled) |
 | **Ctrl+Shift+W** | Set Offhand coordinates (dark when fumbled) |
@@ -120,8 +120,8 @@
 
 4. Set active spell bar coordinates if using spell scrolling:
    - **Ctrl+Shift+J** - Click on left scroll button
-   - **Ctrl+Shift+K** - Click on right scroll button  
-   - **Ctrl+Shift+Z** - Click on spell empty detection area (suggested: near top right corner of the spell icon on the right side of the active spell bar, a spot that switches to a darker color if the spell disappears)
+   - **Ctrl+Shift+O** - Click on right scroll button  
+   - **Ctrl+Shift+Q** - Click on spell empty detection area (suggested: near top right corner of the spell icon on the right side of the active spell bar, a spot that switches to a darker color if the spell disappears)
 5. Rename profile: Use Configuration GUI (Ctrl+Shift+~)
 6. Settings are automatically saved
 7. **💡 Tip:** Use Configuration GUI (Ctrl+Shift+~) to verify your settings are correct!
@@ -167,17 +167,54 @@ VSQ includes a comprehensive GUI for easy configuration:
 ### **GUI Features:**
 - **Profile Management** - Switch between profiles and rename them
 - **Tabbed Interface** - Organized into logical sections:
-  - **Basic** - Health, Mana, Creature detection, Login button
-  - **Attack** - Attack keys, MA skills, Knight heal
-  - **Advanced** - Active spells, Spell casting, Fumble recovery
-  - **Coin Pickup** - Coin area coordinates and settings
-  - **Verification** - Creature list verification settings
+  - **Start** - Game path configuration, login settings, backup options
+  - **Timing** - All timing delays and intervals (ShortDelay, LongDelay, etc.)
+  - **Keys** - Attack keys, MA skills, Knight heal, spell casting, fumble recovery
+  - **Monitoring** - Health/mana monitoring, creature detection, active spells, coin pickup
+  - **Hotkeys** - Complete hotkey reference and legend
+
+### **Tab Details:**
+
+**Start Tab:**
+- Game path configuration and browsing
+- Auto-click login settings and coordinates
+- Backup system configuration
+- Debug logging options
+
+**Timing Tab:**
+- Short/Medium/Long delays
+- Tooltip display time
+- Auto loop intervals
+- Game monitoring frequency
+- Mouse click cooldown settings
+
+**Keys Tab:**
+- Attack key configuration (primary/secondary)
+- MA skills settings (fists/restock modes)
+- Knight heal configuration
+- Spell casting keys (warm/cast)
+- Fumble recovery keys (main hand/offhand)
+
+**Monitoring Tab:**
+- Health monitoring coordinates and settings
+- Mana monitoring coordinates and settings
+- Creature detection configuration
+- Active spell scrolling coordinates
+- Coin pickup area coordinates
+- Creature list verification settings
+
+**Hotkeys Tab:**
+- Complete hotkey reference
+- Core controls (GUI, auto mode, coin pickup)
+- Combat toggles and settings
+- Profile switching shortcuts
 
 ### **Easy Setup:**
 - **"Set" buttons** - Click to capture mouse coordinates automatically
 - **"Change" buttons** - Click to modify key bindings with input dialogs
 - **Real-time preview** - See current values for all settings
 - **Apply changes** - Save all modifications at once
+- **Restore Defaults** - Reset current profile to default settings
 
 ### **Benefits:**
 - **No hotkey memorization** - Visual interface for all settings
@@ -193,27 +230,96 @@ VSQ automatically creates backups to protect your configuration:
 ```ini
 [LOGGING SETTINGS]
 EnableBackups=true          ; Enable/disable automatic backups
-BackupConfigOnly=true       ; true = config only, false = script + config
+BackupConfigOnly=false      ; true = config only, false = script + config
 ```
 
 ### **How It Works:**
-- **Config-Only Mode (default):** Only backs up `VSQ_Config.ini` - perfect for most users since config changes frequently but VSQ.ahk rarely does
-- **Full Backup Mode:** Backs up both VSQ.ahk and config files
+- **Full Backup Mode (default):** Backs up both `VSQ.ahk` and `VSQ_Config.ini` - provides complete protection for your setup
+- **Config-Only Mode:** Only backs up `VSQ_Config.ini` - useful if you want to save space since config changes frequently
 - **Backup Location:** `VSQ_Backups/` folder
-- **Naming:** `VSQ_Config_Backup_YYYYMMDD_HHMMSS.ini`
+- **Naming:** 
+  - Script: `VSQ_Backup_YYYYMMDD_HHMMSS.ahk`
+  - Config: `VSQ_Config_Backup_YYYYMMDD_HHMMSS.ini`
 - **Automatic** - Happens every time you start VSQ
+- **Timestamped** - Each backup includes date and time for easy identification
+
+### **Benefits:**
+- ✅ **Configuration Protection** - Never lose your carefully configured settings
+- ✅ **Version History** - Keep multiple versions of your setup for comparison
+- ✅ **Easy Recovery** - Restore from any previous backup if needed
+- ✅ **Space Efficient** - Config-only mode saves space while still protecting settings
+- ✅ **Zero Maintenance** - Completely automatic, no user intervention required
+
+### **Usage Tips:**
+- **Full backups recommended** - Protects both script and configuration changes
+- **Check backup folder periodically** - Clean up old backups if disk space is limited
+- **Restore from backup** - Simply copy a backup file over the current file to restore
 
 ## 🐛 Troubleshooting
 
-**VSQ won't start:** Check AutoHotkey v2.0 installed, verify game path
-**Automation not working:** Check coordinates set, ready states recorded
-**Nothing happens when enabled:** Keys and coordinates not configured - use hotkeys to set them up
-**Need help with setup:** Use Configuration GUI (Ctrl+Shift+~) to check current settings and see all hotkeys
-**Detection issues:** Re-set coordinates, ensure areas are on actual UI elements
-**Spell scrolling:** Enable with Ctrl+Shift+Z, set all three coordinates
-**Spell casting:** Enable with Ctrl+Shift+X, set warmed spell coordinates
-**Fumble recovery:** Enable with Ctrl+Shift+B/Y, set weapon coordinates (dark when fumbled)
-**Creature list verification:** Set with Ctrl+Shift+G on green arrows, look for 3/3 green pixels in tooltip
+### **Common Issues & Solutions**
+
+#### **VSQ Won't Start**
+- **AutoHotkey v2.0 not installed:** Download from [autohotkey.com](https://www.autohotkey.com/download/ahk-v2.exe)
+- **Game path incorrect:** Check `GamePath` in `VSQ_Config.ini` points to your Stormhalter installation
+
+#### **Automation Not Working**
+- **Coordinates not set:** All coordinates start at (0,0) - you must configure them first
+- **Ready states not recorded:** Press `Ctrl+Shift+R` when cursor is in "ready" state
+- **Keys not configured:** Set attack keys, drink key, etc. in Configuration GUI
+- **Auto mode disabled:** Press **Middle Click** to toggle auto mode on
+
+#### **Coordinate Issues**
+- **Coordinates showing as (0,0):** Use hotkeys like `Ctrl+Shift+H` to set coordinates
+- **Wrong coordinates captured:** Re-set coordinates using the appropriate hotkeys
+- **Coordinates not working after moving window:** VSQ uses absolute coordinates - they should work across monitors
+- **Multi-monitor problems:** Coordinates are screen-absolute, should work on any monitor
+- **Clicking in wrong location:** Verify coordinates are set on actual UI elements, not empty space
+
+#### **Detection Problems**
+- **Health/Mana not detected:** Re-set coordinates with `Ctrl+Shift+H` and `Ctrl+Shift+M`
+- **Creatures not detected:** Re-set creature area with `Ctrl+Shift+C` on the colored gem
+- **Spells not detected:** Re-set spell coordinates with `Ctrl+Shift+J/O/Q`
+- **Pixel detection failing:** Ensure coordinates are on actual UI elements with visible colors
+
+#### **Feature-Specific Issues**
+
+**Spell Scrolling:**
+- **Not scrolling:** Enable with `Ctrl+Shift+Z`, set coordinates with `Ctrl+Shift+J/O/Q`
+- **Scrolling too much:** Check that "spell gone" coordinates are set correctly
+- **Not detecting active spells:** Re-set left/right coordinates on scroll arrows
+
+**Spell Casting:**
+- **Not casting:** Enable with `Ctrl+Shift+X`, set warmed spell coordinates with `Ctrl+Shift+V`
+- **Casting wrong spells:** Check `WarmSpellKey` and `CastSpellKey` settings
+
+**Fumble Recovery:**
+- **Not recovering weapons:** Enable with `Ctrl+Shift+B/Y`, set weapon coordinates (dark when fumbled)
+- **Recovering wrong weapons:** Check `RecoverMainKey` and `RecoverOffhandKey` settings
+
+**Coin Pickup:**
+- **Not finding coins:** Set coin area with `Ctrl+Shift+U/I` (top-left/bottom-right corners)
+- **Clicking wrong location:** Ensure coin area coordinates cover the actual coin drop area
+
+**Creature List Verification:**
+- **Not working:** Set with `Ctrl+Shift+G` on green arrows, look for 3/3 green pixels in tooltip
+- **Too restrictive:** Disable with `Ctrl+Shift+P` if causing issues
+
+#### **Debug & Logging**
+- **Check debug log:** Look in `VSQ_Debug.log` for error messages and detection results
+- **Enable debug logging:** Set `EnableDebugLogging=true` in `VSQ_Config.ini`
+- **Log file too large:** Delete `VSQ_Debug.log` to start fresh
+
+#### **Configuration Issues**
+- **Settings not saving:** Check file permissions, ensure VSQ can write to config file
+- **Profile problems:** Switch profiles with `Ctrl+Shift+1-9`, verify correct profile is active
+- **GUI not opening:** Use `Ctrl+Shift+~` to open Configuration GUI
+- **Settings reset:** Use "Restore Defaults" button in GUI to reset current profile
+
+#### **Performance Issues**
+- **VSQ running slowly:** Check `GameMonitorInterval` setting, increase if needed
+- **Too many clicks:** Adjust `MouseClickCooldown` setting
+- **Detection too frequent:** Increase timing delays in Configuration GUI
 
 
 ## 📁 Files
