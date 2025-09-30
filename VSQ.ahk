@@ -116,6 +116,9 @@ LastMouseClickTime := A_TickCount  ; Track when mouse was last clicked
 
 ; Spell casting settings
 EnableSpellCasting := false
+SpellCastingDelay := 5000  ; Delay in milliseconds between spell casts
+EnableSpellCreatureCheck := true  ; Check for creatures before casting spells
+LastSpellCastTime := 0  ; Track when spell was last cast
 WarmSpellKey := ""
 CastSpellKey := ""
 WarmedSpellX := 0
@@ -148,7 +151,7 @@ LoadConfig(profileToLoad := "") {
     global GamePath, GameExecutable, AutoClickLogin, LoginButtonX, LoginButtonY, UseSecondaryMonitor, SecondaryMonitorNumber, AutoMaximizeWindow, BackupFolder
     global ShortDelay, MediumDelay, LongDelay, TooltipDisplayTime, AutoLoopInterval, CoinRoundTimerDelay, LoginDelay, MouseClickCooldown, GameMonitorInterval, EnableDebugLogging, EnableBackups, BackupConfigOnly
     global MaxProfiles, CurrentProfile, Profile1Name, Profile2Name, Profile3Name, Profile4Name, Profile5Name, Profile6Name, Profile7Name, Profile8Name, Profile9Name
-    global EnableAuto, EnableHealthMonitoring, EnableManaMonitoring, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, DrinkKey, HealthAreaX, HealthAreaY, ManaAreaX, ManaAreaY, CreatureAreaX, CreatureAreaY, EnableMASkill, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, CoinRoundTimerDelay, EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY, ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey, MainHandX, MainHandY, OffHandX, OffHandY, EnableCreatureListVerification, CritListVerifyX, CritListVerifyY
+    global EnableAuto, EnableHealthMonitoring, EnableManaMonitoring, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, DrinkKey, HealthAreaX, HealthAreaY, ManaAreaX, ManaAreaY, CreatureAreaX, CreatureAreaY, EnableMASkill, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, CoinRoundTimerDelay, EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY, ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, SpellCastingDelay, EnableSpellCreatureCheck, LastSpellCastTime, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey, MainHandX, MainHandY, OffHandX, OffHandY, EnableCreatureListVerification, CritListVerifyX, CritListVerifyY
     global ReadyCursorHashes
     static hashString
 
@@ -314,6 +317,8 @@ CreateDefaultConfig() {
         defaultConfig .= "ActiveSpellGoneX=0`n"
         defaultConfig .= "ActiveSpellGoneY=0`n"
         defaultConfig .= "EnableSpellCasting=false`n"
+        defaultConfig .= "SpellCastingDelay=5000`n"
+        defaultConfig .= "EnableSpellCreatureCheck=true`n"
         defaultConfig .= "WarmSpellKey=`n"
         defaultConfig .= "CastSpellKey=`n"
         defaultConfig .= "WarmedSpellX=0`n"
@@ -698,7 +703,7 @@ SaveProfileName(profileNumber, profileName) {
 ; Function to load auto settings for a specific profile
 LoadProfileAutoSettings(profileNumber) {
     global ConfigFile
-    global EnableAuto, EnableHealthMonitoring, EnableManaMonitoring, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, DrinkKey, HealthAreaX, HealthAreaY, ManaAreaX, ManaAreaY, CreatureAreaX, CreatureAreaY, EnableMASkill, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, MoneyRingKey, EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY, ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey, MainHandX, MainHandY, OffHandX, OffHandY, CritListVerifyX, CritListVerifyY, AutoClickLogin, LoginButtonX, LoginButtonY, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, EnableCreatureListVerification
+    global EnableAuto, EnableHealthMonitoring, EnableManaMonitoring, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, DrinkKey, HealthAreaX, HealthAreaY, ManaAreaX, ManaAreaY, CreatureAreaX, CreatureAreaY, EnableMASkill, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, MoneyRingKey, EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY, ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, SpellCastingDelay, EnableSpellCreatureCheck, LastSpellCastTime, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey, MainHandX, MainHandY, OffHandX, OffHandY, CritListVerifyX, CritListVerifyY, AutoClickLogin, LoginButtonX, LoginButtonY, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, EnableCreatureListVerification
     
     sectionName := "PROFILE " . profileNumber
     
@@ -731,6 +736,8 @@ LoadProfileAutoSettings(profileNumber) {
         ActiveSpellGoneX := IniRead(ConfigFile, sectionName, "ActiveSpellGoneX", ActiveSpellGoneX)
         ActiveSpellGoneY := IniRead(ConfigFile, sectionName, "ActiveSpellGoneY", ActiveSpellGoneY)
         EnableSpellCasting := (IniRead(ConfigFile, sectionName, "EnableSpellCasting", EnableSpellCasting ? "true" : "false") = "true")
+        SpellCastingDelay := IniRead(ConfigFile, sectionName, "SpellCastingDelay", SpellCastingDelay)
+        EnableSpellCreatureCheck := (IniRead(ConfigFile, sectionName, "EnableSpellCreatureCheck", EnableSpellCreatureCheck ? "true" : "false") = "true")
         WarmSpellKey := IniRead(ConfigFile, sectionName, "WarmSpellKey", WarmSpellKey)
         CastSpellKey := IniRead(ConfigFile, sectionName, "CastSpellKey", CastSpellKey)
         WarmedSpellX := IniRead(ConfigFile, sectionName, "WarmedSpellX", WarmedSpellX)
@@ -762,7 +769,7 @@ LoadProfileAutoSettings(profileNumber) {
 ; Function to save auto settings for a specific profile
 SaveProfileAutoSettings(profileNumber) {
     global ConfigFile
-    global EnableAuto, EnableHealthMonitoring, EnableManaMonitoring, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, DrinkKey, HealthAreaX, HealthAreaY, ManaAreaX, ManaAreaY, CreatureAreaX, CreatureAreaY, EnableMASkill, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, MoneyRingKey, EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY, ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey, MainHandX, MainHandY, OffHandX, OffHandY, CritListVerifyX, CritListVerifyY, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, EnableCreatureListVerification
+    global EnableAuto, EnableHealthMonitoring, EnableManaMonitoring, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, DrinkKey, HealthAreaX, HealthAreaY, ManaAreaX, ManaAreaY, CreatureAreaX, CreatureAreaY, EnableMASkill, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, MoneyRingKey, EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY, ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, SpellCastingDelay, EnableSpellCreatureCheck, LastSpellCastTime, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey, MainHandX, MainHandY, OffHandX, OffHandY, CritListVerifyX, CritListVerifyY, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, EnableCreatureListVerification
     
     sectionName := "PROFILE " . profileNumber
     
@@ -795,6 +802,8 @@ SaveProfileAutoSettings(profileNumber) {
         IniWrite(ActiveSpellGoneX, ConfigFile, sectionName, "ActiveSpellGoneX")
         IniWrite(ActiveSpellGoneY, ConfigFile, sectionName, "ActiveSpellGoneY")
         IniWrite(EnableSpellCasting ? "true" : "false", ConfigFile, sectionName, "EnableSpellCasting")
+        IniWrite(SpellCastingDelay, ConfigFile, sectionName, "SpellCastingDelay")
+        IniWrite(EnableSpellCreatureCheck ? "true" : "false", ConfigFile, sectionName, "EnableSpellCreatureCheck")
         IniWrite(WarmSpellKey, ConfigFile, sectionName, "WarmSpellKey")
         IniWrite(CastSpellKey, ConfigFile, sectionName, "CastSpellKey")
         IniWrite(WarmedSpellX, ConfigFile, sectionName, "WarmedSpellX")
@@ -859,6 +868,8 @@ RestoreProfileDefaults(profileNumber) {
         IniWrite("0", ConfigFile, sectionName, "ActiveSpellGoneX")
         IniWrite("0", ConfigFile, sectionName, "ActiveSpellGoneY")
         IniWrite("false", ConfigFile, sectionName, "EnableSpellCasting")
+        IniWrite("5000", ConfigFile, sectionName, "SpellCastingDelay")
+        IniWrite("true", ConfigFile, sectionName, "EnableSpellCreatureCheck")
         IniWrite("", ConfigFile, sectionName, "WarmSpellKey")
         IniWrite("", ConfigFile, sectionName, "CastSpellKey")
         IniWrite("0", ConfigFile, sectionName, "WarmedSpellX")
@@ -1094,7 +1105,7 @@ CountPixels(x, y, colorType) {
             }
         } else if (colorType = "dark") {
             ; Check if pixel is very dark (very low RGB values, almost black) but not completely black
-            if (red < 50 && green < 50 && blue < 50 && (red > 18 || green > 19 || blue > 20)) {
+            if (red < 50 && green < 50 && blue < 50) {
                 pixelCount++
             }
         } else if (colorType = "black") {
@@ -1226,6 +1237,24 @@ CheckCreatures() {
         LogMessage("CreatureCheck: Error checking creatures: " . e.Message)
         return true  ; Default to true on error
     }
+}
+
+; Function to check if enough time has passed since last spell cast
+CheckSpellDelay() {
+    global LastSpellCastTime, SpellCastingDelay
+    
+    ; If no spell has been cast yet, allow casting
+    if (LastSpellCastTime = 0) {
+        return true
+    }
+    
+    currentTime := A_TickCount
+    if ((currentTime - LastSpellCastTime) < SpellCastingDelay) {
+        LogMessage("Auto: Spell casting delay not yet exceeded - skipping cast")
+        return false
+    }
+    
+    return true
 }
 
 ; Function to check if player is ready to act based on cursor hash
@@ -1506,7 +1535,7 @@ AutoLoop() {
 
 ; Determine the next action based on priority
 GetNextAction() {
-    global EnableHealthMonitoring, EnableManaMonitoring, EnableMASkill, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, EnableKnightHeal, KnightHealKey, DrinkKey, EnableSpellCasting, RecoverFumbleMain, RecoverFumbleOffhand, MainHandX, MainHandY, OffHandX, OffHandY
+    global EnableHealthMonitoring, EnableManaMonitoring, EnableMASkill, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, EnableKnightHeal, KnightHealKey, DrinkKey, EnableSpellCasting, SpellCastingDelay, EnableSpellCreatureCheck, LastSpellCastTime, RecoverFumbleMain, RecoverFumbleOffhand, MainHandX, MainHandY, OffHandX, OffHandY
     
     ; Priority 1: Fumble recovery - highest priority
     if (RecoverFumbleMain && MainHandX != 0 && MainHandY != 0) {
@@ -1533,12 +1562,15 @@ GetNextAction() {
     }
     
     ; Priority 4: Cast - if spell casting is enabled and has mana
-    if (EnableSpellCasting && EnableManaMonitoring && CheckMana()) {
-        ; Check if AttackSpamReduction is enabled and creatures are present
-        if (AttackSpamReduction && !CheckCreatures()) {
-            LogMessage("Auto: No creatures detected - skipping cast")
-            return ""  ; No action if no creatures
+    if (EnableSpellCasting && EnableManaMonitoring && CheckMana() && CheckSpellDelay()) {
+        ; Only check for creatures if creature checking is enabled for spells
+        if (EnableSpellCreatureCheck) {
+            if (AttackSpamReduction && !CheckCreatures()) {
+                LogMessage("Auto: No creatures detected - skipping cast")
+                return ""  ; No action if no creatures
+            }
         }
+        
         return "CAST"
     }
     
@@ -1558,7 +1590,7 @@ GetNextAction() {
 
 ; Execute the determined action
 ExecuteAction(action) {
-    global AttackKey1, AttackKey2, EnableAttackKey2, DrinkKey, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverMainKey, RecoverOffhandKey
+    global AttackKey1, AttackKey2, EnableAttackKey2, DrinkKey, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverMainKey, RecoverOffhandKey, LastSpellCastTime
     
     switch action {
         case "RECOVER-MAIN":
@@ -1636,6 +1668,7 @@ ExecuteAction(action) {
                 ; Spell is warmed, cast it
                 if (CastSpellKey != "") {
                     SendKey(CastSpellKey)
+                    LastSpellCastTime := A_TickCount  ; Record when spell was cast
                     LogMessage("Auto: Casting warmed spell")
                 }
             } else {
@@ -2971,12 +3004,19 @@ CreateKeysTab() {
     ConfigGUI.AddEdit("x430 y292 w40 h20 vKnightHealKey")
 
     ; Spell Casting Group
-    ConfigGUI.AddGroupBox("x300 y330 w220 h100", "Spell Casting")
+    ConfigGUI.AddGroupBox("x300 y330 w220 h170", "Spell Casting")
     ConfigGUI.AddCheckBox("x310 y350 w150 h20 vEnableSpellCasting", "Enable Spell Casting")
-    ConfigGUI.AddText("x310 y375 w80 h20", "Warm Key:")
-    ConfigGUI.AddEdit("x430 y372 w40 h20 vWarmSpellKey")
-    ConfigGUI.AddText("x310 y400 w80 h20", "Cast Key:")
-    ConfigGUI.AddEdit("x430 y397 w40 h20 vCastSpellKey")
+    ConfigGUI.AddCheckBox("x310 y375 w200 h20 vEnableSpellCreatureCheck", "Require creatures present")
+    ConfigGUI.AddText("x310 y400 w80 h20", "Warm Key:")
+    ConfigGUI.AddEdit("x430 y397 w40 h20 vWarmSpellKey")
+    ConfigGUI.AddText("x310 y425 w80 h20", "Cast Key:")
+    ConfigGUI.AddEdit("x430 y422 w40 h20 vCastSpellKey")
+    ConfigGUI.AddText("x310 y450 w100 h20", "Delay (ms):")
+    ConfigGUI.AddEdit("x430 y447 w60 h20 vSpellCastingDelay")
+    ConfigGUI.AddText("x310 y475 w100 h20", "Warmed Spell:")
+    ConfigGUI.AddEdit("x385 y472 w30 h20 vWarmedSpellX")
+    ConfigGUI.AddEdit("x420 y472 w30 h20 vWarmedSpellY")
+    ConfigGUI.AddText("x455 y475 w60 h20 cBlue", "Ctrl+Shift+V")
     
 }
 
@@ -3197,8 +3237,8 @@ LoadProfileToGUI() {
     global LoginButtonX, LoginButtonY, DrinkKey, AttackKey1, AttackKey2, EnableAttackKey2
     global EnableMASkill, CurrentMASkill, MAFistsKey, MARestockKey, EnableKnightHeal, KnightHealKey
     global EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY
-    global ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, WarmSpellKey, CastSpellKey
-    global WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey
+    global ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, SpellCastingDelay, EnableSpellCreatureCheck, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY
+    global RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey
     global MainHandX, MainHandY, OffHandX, OffHandY, CoinAreaTopLeftX, CoinAreaTopLeftY
     global CoinAreaBottomRightX, CoinAreaBottomRightY, MoneyRingKey, EnableCreatureListVerification
     global CritListVerifyX, CritListVerifyY, EnableHealthMonitoring, EnableManaMonitoring, AttackSpamReduction
@@ -3284,8 +3324,12 @@ LoadProfileToGUI() {
         
         ; Advanced Settings (Keys tab remaining controls)
         ConfigGUI["EnableSpellCasting"].Value := EnableSpellCasting ? 1 : 0
+        ConfigGUI["SpellCastingDelay"].Text := SpellCastingDelay
+        ConfigGUI["EnableSpellCreatureCheck"].Value := EnableSpellCreatureCheck ? 1 : 0
         ConfigGUI["WarmSpellKey"].Text := WarmSpellKey
         ConfigGUI["CastSpellKey"].Text := CastSpellKey
+        ConfigGUI["WarmedSpellX"].Text := WarmedSpellX
+        ConfigGUI["WarmedSpellY"].Text := WarmedSpellY
         ConfigGUI["RecoverFumbleMain"].Value := RecoverFumbleMain ? 1 : 0
         ConfigGUI["RecoverFumbleOffhand"].Value := RecoverFumbleOffhand ? 1 : 0
         ConfigGUI["RecoverMainKey"].Text := RecoverMainKey
@@ -3455,7 +3499,7 @@ SaveStartTabSettings(*) {
 }
 
 SaveKeysTabSettings(*) {
-    global ConfigGUI, CurrentProfile, AttackKey1, AttackKey2, EnableAttackKey2, DrinkKey, EnableMASkill, MAFistsKey, MARestockKey, EnableKnightHeal, KnightHealKey, EnableSpellCasting, WarmSpellKey, CastSpellKey, RecoverFumbleMain, RecoverMainKey, RecoverFumbleOffhand, RecoverOffhandKey, MoneyRingKey, MainHandX, MainHandY, OffHandX, OffHandY, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, ConfigFile
+    global ConfigGUI, CurrentProfile, AttackKey1, AttackKey2, EnableAttackKey2, DrinkKey, EnableMASkill, MAFistsKey, MARestockKey, EnableKnightHeal, KnightHealKey, EnableSpellCasting, SpellCastingDelay, EnableSpellCreatureCheck, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverMainKey, RecoverFumbleOffhand, RecoverOffhandKey, MoneyRingKey, MainHandX, MainHandY, OffHandX, OffHandY, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, ConfigFile
     
     if (!ConfigGUI || !ConfigGUI.Hwnd) {
         return
@@ -3488,8 +3532,12 @@ SaveKeysTabSettings(*) {
         EnableKnightHeal := ConfigGUI["EnableKnightHeal"].Value = 1
         KnightHealKey := ConfigGUI["KnightHealKey"].Text
         EnableSpellCasting := ConfigGUI["EnableSpellCasting"].Value = 1
+        SpellCastingDelay := ConfigGUI["SpellCastingDelay"].Text
+        EnableSpellCreatureCheck := ConfigGUI["EnableSpellCreatureCheck"].Value = 1
         WarmSpellKey := ConfigGUI["WarmSpellKey"].Text
         CastSpellKey := ConfigGUI["CastSpellKey"].Text
+        WarmedSpellX := ConfigGUI["WarmedSpellX"].Text
+        WarmedSpellY := ConfigGUI["WarmedSpellY"].Text
         RecoverFumbleMain := ConfigGUI["RecoverFumbleMain"].Value = 1
         RecoverMainKey := ConfigGUI["RecoverMainKey"].Text
         RecoverFumbleOffhand := ConfigGUI["RecoverFumbleOffhand"].Value = 1
