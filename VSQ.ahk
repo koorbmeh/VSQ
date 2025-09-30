@@ -3516,7 +3516,7 @@ SaveKeysTabSettings(*) {
 }
 
 SaveMonitoringTabSettings(*) {
-    global ConfigGUI, CurrentProfile, EnableHealthMonitoring, HealthAreaX, HealthAreaY, EnableManaMonitoring, ManaAreaX, ManaAreaY, AttackSpamReduction, CreatureAreaX, CreatureAreaY, EnableCreatureListVerification, CritListVerifyX, CritListVerifyY, ReadyCursorHashes, ConfigFile
+    global ConfigGUI, CurrentProfile, EnableHealthMonitoring, HealthAreaX, HealthAreaY, EnableManaMonitoring, ManaAreaX, ManaAreaY, AttackSpamReduction, CreatureAreaX, CreatureAreaY, EnableCreatureListVerification, CritListVerifyX, CritListVerifyY, ReadyCursorHashes, ConfigFile, EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY, ActiveSpellGoneX, ActiveSpellGoneY
     
     if (!ConfigGUI || !ConfigGUI.Hwnd) {
         return
