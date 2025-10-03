@@ -1257,6 +1257,26 @@ CheckSpellDelay() {
     return true
 }
 
+; Function to check if a spell is currently warmed
+CheckWarmed() {
+    global WarmedSpellX, WarmedSpellY
+    
+    ; Check if warmed spell coordinates are set
+    if (WarmedSpellX = 0 && WarmedSpellY = 0) {
+        return false
+    }
+    
+    ; Check if spell is warmed by looking for dark pixels (spell is NOT warmed when dark)
+    darkPixelCount := CountDarkPixels(WarmedSpellX, WarmedSpellY)
+    isSpellWarmed := darkPixelCount < 2
+    
+    if (isSpellWarmed) {
+        LogMessage("Auto: Spell is currently warmed")
+    }
+    
+    return isSpellWarmed
+}
+
 ; Function to check if player is ready to act based on cursor hash
 CheckReady(reset := false) {
     global ReadyCursorHashes
@@ -1556,12 +1576,17 @@ GetNextAction() {
         return "HEAL"
     }
     
-    ; Priority 3: MASkill - if enabled and has mana
+    ; Priority 3: Cast warmed spell - if spell casting is enabled and spell is already warmed
+    if (EnableSpellCasting && CheckWarmed()) {
+        return "CAST"
+    }
+    
+    ; Priority 4: MASkill - if enabled and has mana
     if (EnableMASkill && EnableManaMonitoring && CheckMana()) {
         return "MASKILL"
     }
     
-    ; Priority 4: Cast - if spell casting is enabled and has mana
+    ; Priority 5: Cast - if spell casting is enabled and has mana
     if (EnableSpellCasting && EnableManaMonitoring && CheckMana() && CheckSpellDelay()) {
         ; Only check for creatures if creature checking is enabled for spells
         if (EnableSpellCreatureCheck) {
@@ -1574,7 +1599,7 @@ GetNextAction() {
         return "CAST"
     }
     
-    ; Priority 5: Attack - if we have attack keys configured
+    ; Priority 6: Attack - if we have attack keys configured
     if (AttackKey1 != "" || (EnableAttackKey2 && AttackKey2 != "")) {
         ; Check if AttackSpamReduction is enabled and creatures are present
         if (AttackSpamReduction && !CheckCreatures()) {
@@ -1654,17 +1679,8 @@ ExecuteAction(action) {
                 LogMessage("Auto: Executed MA Restock action")
             }
         case "CAST":
-            ; Check if spell is warmed
-            if (WarmedSpellX = 0 && WarmedSpellY = 0) {
-                LogMessage("Auto: Warmed spell coordinates not set - skipping cast")
-                return
-            }
-            
-            ; Check if spell is warmed by looking for dark pixels (spell is NOT warmed when dark)
-            darkPixelCount := CountDarkPixels(WarmedSpellX, WarmedSpellY)
-            isSpellWarmed := darkPixelCount < 2
-            
-            if (isSpellWarmed) {
+            ; Check if spell is warmed using the CheckWarmed function
+            if (CheckWarmed()) {
                 ; Spell is warmed, cast it
                 if (CastSpellKey != "") {
                     SendKey(CastSpellKey)
