@@ -23,7 +23,7 @@
 - **Smart Combat** - Triggers attacks when creatures detected
 - **Fumble Recovery** - Auto-recovers fumbled weapons (main hand/offhand)
 - **Spell Casting** - Auto-warms and casts spells based on mana
-- **MA Skills** - Martial Arts automation (fists/restock modes)
+- **MA Skills** - Martial Arts automation (fists/restock/auto modes)
 - **Knight Heal** - Mana-based healing
 - **Coin Pickup** - One-click banker ring use
 - **Active Spell Scrolling** - Auto-scrolls active spells left/right
@@ -67,7 +67,7 @@
 | **Ctrl+Shift+S** | Toggle second attack |
 | **Ctrl+Shift+E** | Swap attack keys |
 | **Ctrl+Shift+A** | Toggle MA Skills |
-| **Ctrl+Shift+T** | Toggle MA mode (fists/restock) |
+| **Ctrl+Shift+T** | Toggle MA mode (fists/restock/auto) |
 | **Ctrl+Shift+K** | Toggle Knight Heal |
 | **Ctrl+Shift+Z** | Toggle Active Spell Scrolling |
 | **Ctrl+Shift+X** | Toggle Spell Casting |
@@ -149,12 +149,30 @@
 - **Pixel Detection** - Color analysis for health/mana/creatures/spells
 - **Fumble Recovery** - Auto-recovers fumbled weapons using dark pixel detection
 - **Spell Casting** - Auto-warms and casts spells based on mana and spell state
-- **MA Skills** - Fists mode (fists + attack) or Restock mode (restock + attacks)
+- **MA Skills** - Fists mode (fists + attack), Restock mode (restock + attacks), or Auto mode (intelligent switching between fists and restock)
 - **Coin Pickup** - 8x8 grid scanning with precise timing
 - **Active Spells** - Auto-scrolls based on color detection, respects user clicks (2s cooldown)
 - **Creature Detection** - Prevents spam when no enemies present
 - **Creature List Verification** - Optional additional check to ensure creature list is active before combat actions (green arrow detection)
 - **Configuration GUI** - Visual interface for easy setup and configuration of all settings
+
+## 🥊 MA Auto Mode - Intelligent Mode Switching
+
+The new **MA Auto Mode** provides intelligent potion management for Martial Arts skills:
+
+**MA Auto Mode only works when Auto Fight is activated** (Middle Mouse Button). The system must be in Auto mode to track potion usage and make intelligent MA decisions.
+
+### **How It Works:**
+1. **Tracks Potion Usage** - Counts each healing potion consumed via DrinkKey (only when Auto Fight is active)
+2. **Smart Restocking** - Only restocks when you've used enough potions to justify the restock
+3. **Automatic Switching** - Uses Fists when potions are full, Restocks when potions are needed
+4. **Potion Warning** - Alerts you when using potions faster than you can restock them
+
+### **Configuration:**
+- **Set Potions per Restock** (1-3) in Configuration GUI → Keys tab → MA Skills group
+- **Enable Auto Mode** via checkbox or Ctrl+Shift+T hotkey
+- **Configure MA Keys** - Set your Fists and Restock command keys
+- **Activate Auto Fight** - Press Middle Mouse Button to enable the automation system
 
 ## 🖥️ Configuration GUI
 
@@ -190,7 +208,7 @@ VSQ includes a comprehensive GUI for easy configuration:
 
 **Keys Tab:**
 - Attack key configuration (primary/secondary)
-- MA skills settings (fists/restock modes)
+- MA skills settings (fists/restock/auto modes with potion tracking)
 - Knight heal configuration
 - Spell casting keys (warm/cast)
 - Fumble recovery keys (main hand/offhand)

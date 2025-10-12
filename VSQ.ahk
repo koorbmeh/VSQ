@@ -92,6 +92,8 @@ EnableMASkill := false
 MAFistsKey := ""
 MARestockKey := ""
 CurrentMASkill := "restock"
+PotionsPerRestock := 1
+UsedPotionsCount := 0
 
 ; Knight Heal settings
 EnableKnightHeal := false
@@ -151,7 +153,7 @@ LoadConfig(profileToLoad := "") {
     global GamePath, GameExecutable, AutoClickLogin, LoginButtonX, LoginButtonY, UseSecondaryMonitor, SecondaryMonitorNumber, AutoMaximizeWindow, BackupFolder
     global ShortDelay, MediumDelay, LongDelay, TooltipDisplayTime, AutoLoopInterval, CoinRoundTimerDelay, LoginDelay, MouseClickCooldown, GameMonitorInterval, EnableDebugLogging, EnableBackups, BackupConfigOnly
     global MaxProfiles, CurrentProfile, Profile1Name, Profile2Name, Profile3Name, Profile4Name, Profile5Name, Profile6Name, Profile7Name, Profile8Name, Profile9Name
-    global EnableAuto, EnableHealthMonitoring, EnableManaMonitoring, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, DrinkKey, HealthAreaX, HealthAreaY, ManaAreaX, ManaAreaY, CreatureAreaX, CreatureAreaY, EnableMASkill, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, CoinRoundTimerDelay, EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY, ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, SpellCastingDelay, EnableSpellCreatureCheck, LastSpellCastTime, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey, MainHandX, MainHandY, OffHandX, OffHandY, EnableCreatureListVerification, CritListVerifyX, CritListVerifyY
+    global EnableAuto, EnableHealthMonitoring, EnableManaMonitoring, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, DrinkKey, HealthAreaX, HealthAreaY, ManaAreaX, ManaAreaY, CreatureAreaX, CreatureAreaY, EnableMASkill, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, CoinRoundTimerDelay, EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY, ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, SpellCastingDelay, EnableSpellCreatureCheck, LastSpellCastTime, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey, MainHandX, MainHandY, OffHandX, OffHandY, EnableCreatureListVerification, CritListVerifyX, CritListVerifyY, PotionsPerRestock, UsedPotionsCount
     global ReadyCursorHashes
     static hashString
 
@@ -703,7 +705,7 @@ SaveProfileName(profileNumber, profileName) {
 ; Function to load auto settings for a specific profile
 LoadProfileAutoSettings(profileNumber) {
     global ConfigFile
-    global EnableAuto, EnableHealthMonitoring, EnableManaMonitoring, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, DrinkKey, HealthAreaX, HealthAreaY, ManaAreaX, ManaAreaY, CreatureAreaX, CreatureAreaY, EnableMASkill, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, MoneyRingKey, EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY, ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, SpellCastingDelay, EnableSpellCreatureCheck, LastSpellCastTime, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey, MainHandX, MainHandY, OffHandX, OffHandY, CritListVerifyX, CritListVerifyY, AutoClickLogin, LoginButtonX, LoginButtonY, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, EnableCreatureListVerification
+    global EnableAuto, EnableHealthMonitoring, EnableManaMonitoring, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, DrinkKey, HealthAreaX, HealthAreaY, ManaAreaX, ManaAreaY, CreatureAreaX, CreatureAreaY, EnableMASkill, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, MoneyRingKey, EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY, ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, SpellCastingDelay, EnableSpellCreatureCheck, LastSpellCastTime, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey, MainHandX, MainHandY, OffHandX, OffHandY, CritListVerifyX, CritListVerifyY, AutoClickLogin, LoginButtonX, LoginButtonY, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, EnableCreatureListVerification, PotionsPerRestock, UsedPotionsCount
     
     sectionName := "PROFILE " . profileNumber
     
@@ -725,6 +727,8 @@ LoadProfileAutoSettings(profileNumber) {
         MAFistsKey := IniRead(ConfigFile, sectionName, "MAFistsKey", MAFistsKey)
         MARestockKey := IniRead(ConfigFile, sectionName, "MARestockKey", MARestockKey)
         CurrentMASkill := IniRead(ConfigFile, sectionName, "CurrentMASkill", CurrentMASkill)
+        PotionsPerRestock := IniRead(ConfigFile, sectionName, "PotionsPerRestock", PotionsPerRestock)
+        UsedPotionsCount := IniRead(ConfigFile, sectionName, "UsedPotionsCount", UsedPotionsCount)
         EnableKnightHeal := (IniRead(ConfigFile, sectionName, "EnableKnightHeal", EnableKnightHeal ? "true" : "false") = "true")
         KnightHealKey := IniRead(ConfigFile, sectionName, "KnightHealKey", KnightHealKey)
         MoneyRingKey := IniRead(ConfigFile, sectionName, "MoneyRingKey", MoneyRingKey)
@@ -769,7 +773,7 @@ LoadProfileAutoSettings(profileNumber) {
 ; Function to save auto settings for a specific profile
 SaveProfileAutoSettings(profileNumber) {
     global ConfigFile
-    global EnableAuto, EnableHealthMonitoring, EnableManaMonitoring, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, DrinkKey, HealthAreaX, HealthAreaY, ManaAreaX, ManaAreaY, CreatureAreaX, CreatureAreaY, EnableMASkill, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, MoneyRingKey, EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY, ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, SpellCastingDelay, EnableSpellCreatureCheck, LastSpellCastTime, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey, MainHandX, MainHandY, OffHandX, OffHandY, CritListVerifyX, CritListVerifyY, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, EnableCreatureListVerification
+    global EnableAuto, EnableHealthMonitoring, EnableManaMonitoring, AttackKey1, AttackKey2, EnableAttackKey2, AttackSpamReduction, DrinkKey, HealthAreaX, HealthAreaY, ManaAreaX, ManaAreaY, CreatureAreaX, CreatureAreaY, EnableMASkill, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, MoneyRingKey, EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY, ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, SpellCastingDelay, EnableSpellCreatureCheck, LastSpellCastTime, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey, MainHandX, MainHandY, OffHandX, OffHandY, CritListVerifyX, CritListVerifyY, CoinAreaTopLeftX, CoinAreaTopLeftY, CoinAreaBottomRightX, CoinAreaBottomRightY, EnableCreatureListVerification, PotionsPerRestock, UsedPotionsCount
     
     sectionName := "PROFILE " . profileNumber
     
@@ -791,6 +795,8 @@ SaveProfileAutoSettings(profileNumber) {
         IniWrite(MAFistsKey, ConfigFile, sectionName, "MAFistsKey")
         IniWrite(MARestockKey, ConfigFile, sectionName, "MARestockKey")
         IniWrite(CurrentMASkill, ConfigFile, sectionName, "CurrentMASkill")
+        IniWrite(PotionsPerRestock, ConfigFile, sectionName, "PotionsPerRestock")
+        IniWrite(UsedPotionsCount, ConfigFile, sectionName, "UsedPotionsCount")
         IniWrite(EnableKnightHeal ? "true" : "false", ConfigFile, sectionName, "EnableKnightHeal")
         IniWrite(KnightHealKey, ConfigFile, sectionName, "KnightHealKey")
         IniWrite(MoneyRingKey, ConfigFile, sectionName, "MoneyRingKey")
@@ -857,6 +863,8 @@ RestoreProfileDefaults(profileNumber) {
         IniWrite("", ConfigFile, sectionName, "MAFistsKey")
         IniWrite("", ConfigFile, sectionName, "MARestockKey")
         IniWrite("restock", ConfigFile, sectionName, "CurrentMASkill")
+        IniWrite("1", ConfigFile, sectionName, "PotionsPerRestock")
+        IniWrite("0", ConfigFile, sectionName, "UsedPotionsCount")
         IniWrite("false", ConfigFile, sectionName, "EnableKnightHeal")
         IniWrite("", ConfigFile, sectionName, "KnightHealKey")
         IniWrite("", ConfigFile, sectionName, "MoneyRingKey")
@@ -1615,7 +1623,7 @@ GetNextAction() {
 
 ; Execute the determined action
 ExecuteAction(action) {
-    global AttackKey1, AttackKey2, EnableAttackKey2, DrinkKey, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverMainKey, RecoverOffhandKey, LastSpellCastTime
+    global AttackKey1, AttackKey2, EnableAttackKey2, DrinkKey, MAFistsKey, MARestockKey, CurrentMASkill, EnableKnightHeal, KnightHealKey, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY, RecoverMainKey, RecoverOffhandKey, LastSpellCastTime, PotionsPerRestock, UsedPotionsCount, EnableMASkill, TooltipDisplayTime
     
     switch action {
         case "RECOVER-MAIN":
@@ -1637,6 +1645,17 @@ ExecuteAction(action) {
                 }
             } else if (DrinkKey != "") {
                 SendKey(DrinkKey)
+                ; Track drink usage for MA Auto mode (only if MA Skills are enabled)
+                if (EnableMASkill && CurrentMASkill = "auto") {
+                    UsedPotionsCount++
+                    LogMessage("Auto: Used potion #" . UsedPotionsCount . " (total used: " . UsedPotionsCount . "/" . PotionsPerRestock . ")")
+                    
+                    ; Warn if using potions faster than restocking
+                    if (UsedPotionsCount >= 6) {
+                        ToolTip("WARNING: Using potions faster than restocking! Used: " . UsedPotionsCount . " (Restock: " . PotionsPerRestock . ")", , , 20)
+                        SetTimer(() => ToolTip(, , , 20), -TooltipDisplayTime)
+                    }
+                }
                 LogMessage("Auto: Executed drink action" . (EnableKnightHeal ? " (no mana for Knight Heal)" : ""))
             }
         case "MASKILL":
@@ -1677,6 +1696,51 @@ ExecuteAction(action) {
                     SendKey(AttackKey2)
                 }
                 LogMessage("Auto: Executed MA Restock action")
+            } else if (CurrentMASkill = "auto") {
+                ; Auto mode: restock if we've used enough potions, otherwise do fists
+                if (UsedPotionsCount >= PotionsPerRestock) {
+                    ; We've used potions, restock to replace them
+                    if (MARestockKey != "") {
+                        SendKey(MARestockKey)
+                    }
+                    
+                    ; Reduce the used potions count by the amount restocked
+                    UsedPotionsCount := UsedPotionsCount - PotionsPerRestock
+                    LogMessage("Auto: MA Auto mode - Restocking to replace " . PotionsPerRestock . " potions (remaining used: " . UsedPotionsCount . ")")
+                    
+                    ; Check if AttackSpamReduction is enabled and creatures are present before attacking
+                    if (AttackSpamReduction && !CheckCreatures()) {
+                        LogMessage("Auto: No creatures detected - skipping MA Auto Restock attacks")
+                        return
+                    }
+                    
+                    ; Send AttackKey1 and AttackKey2 (if enabled)
+                    if (AttackKey1 != "") {
+                        Sleep(ShortDelay)  ; Delay between keys
+                        SendKey(AttackKey1)
+                    }
+                    if (EnableAttackKey2 && AttackKey2 != "") {
+                        Sleep(ShortDelay)  ; Delay between keys
+                        SendKey(AttackKey2)
+                    }
+                    LogMessage("Auto: Executed MA Auto Restock action")
+                } else {
+                    ; No potions used, do fists
+                    ; Check if AttackSpamReduction is enabled and creatures are present
+                    if (AttackSpamReduction && !CheckCreatures()) {
+                        LogMessage("Auto: No creatures detected - skipping MA Auto Fists action")
+                        return
+                    }
+                    ; Send MAFistsKey then AttackKey2 (if enabled)
+                    if (MAFistsKey != "") {
+                        SendKey(MAFistsKey)
+                    }
+                    if (EnableAttackKey2 && AttackKey2 != "") {
+                        Sleep(ShortDelay)  ; Delay between keys
+                        SendKey(AttackKey2)
+                    }
+                    LogMessage("Auto: Executed MA Auto Fists action")
+                }
             }
         case "CAST":
             ; Check if spell is warmed using the CheckWarmed function
@@ -2593,12 +2657,14 @@ MButton::{
     LogMessage("MA Skill " . status . " for profile " . CurrentProfile . " - " . GetProfileName(CurrentProfile))
 }
 
-; Ctrl+Shift+T - Toggle CurrentMASkill between fists and restock
+; Ctrl+Shift+T - Toggle CurrentMASkill between fists, restock, and auto
 ^+t::{
     global CurrentMASkill, CurrentProfile, GUIOpen, ConfigGUI
     
     if (CurrentMASkill = "fists") {
         CurrentMASkill := "restock"
+    } else if (CurrentMASkill = "restock") {
+        CurrentMASkill := "auto"
     } else {
         CurrentMASkill := "fists"
     }
@@ -2612,9 +2678,15 @@ MButton::{
             if (CurrentMASkill = "fists") {
                 ConfigGUI["MAFistsMode"].Value := 1
                 ConfigGUI["MARestockMode"].Value := 0
-            } else {
+                ConfigGUI["MAAutoMode"].Value := 0
+            } else if (CurrentMASkill = "restock") {
                 ConfigGUI["MAFistsMode"].Value := 0
                 ConfigGUI["MARestockMode"].Value := 1
+                ConfigGUI["MAAutoMode"].Value := 0
+            } else if (CurrentMASkill = "auto") {
+                ConfigGUI["MAFistsMode"].Value := 0
+                ConfigGUI["MARestockMode"].Value := 0
+                ConfigGUI["MAAutoMode"].Value := 1
             }
         } catch Error as e {
             LogMessage("Error updating GUI MA mode: " . e.Message)
@@ -3000,39 +3072,42 @@ CreateKeysTab() {
     
     ; Right Column
     ; MA Skills Group (moved to right column)
-    ConfigGUI.AddGroupBox("x300 y90 w220 h150", "MA Skills")
+    ConfigGUI.AddGroupBox("x300 y90 w220 h170", "MA Skills")
     ConfigGUI.AddCheckBox("x310 y110 w150 h20 vEnableMASkill", "Enable MA Skills")
     
     ; MA Mode Selection (mutually exclusive checkboxes)
     ConfigGUI.AddText("x310 y135 w80 h20", "Mode:")
-    ConfigGUI.AddCheckBox("x310 y155 w60 h20 vMAFistsMode", "Fists").OnEvent("Click", OnMAFistsModeChange)
-    ConfigGUI.AddCheckBox("x380 y155 w80 h20 vMARestockMode", "Restock").OnEvent("Click", OnMARestockModeChange)
+    ConfigGUI.AddCheckBox("x310 y155 w43 h20 vMAFistsMode", "Fists").OnEvent("Click", OnMAFistsModeChange)
+    ConfigGUI.AddCheckBox("x355 y155 w60 h20 vMARestockMode", "Restock").OnEvent("Click", OnMARestockModeChange)
+    ConfigGUI.AddCheckBox("x420 y155 w50 h20 vMAAutoMode", "Auto").OnEvent("Click", OnMAAutoModeChange)
     
     ConfigGUI.AddText("x310 y180 w100 h20", "MA Fists Key:")
     ConfigGUI.AddEdit("x430 y177 w40 h20 vMAFistsKey")
     ConfigGUI.AddText("x310 y205 w100 h20", "MA Restock Key:")
     ConfigGUI.AddEdit("x430 y202 w40 h20 vMARestockKey")
+    ConfigGUI.AddText("x310 y230 w100 h20", "Potions per Restock:")
+    ConfigGUI.AddEdit("x430 y227 w20 h20 vPotionsPerRestock")
     
     ; Knight Heal Group (moved to right column)
-    ConfigGUI.AddGroupBox("x300 y250 w220 h70", "Knight Heal")
-    ConfigGUI.AddCheckBox("x310 y270 w150 h20 vEnableKnightHeal", "Enable Knight Heal")
-    ConfigGUI.AddText("x310 y295 w80 h20", "Key:")
-    ConfigGUI.AddEdit("x430 y292 w40 h20 vKnightHealKey")
+    ConfigGUI.AddGroupBox("x300 y270 w220 h70", "Knight Heal")
+    ConfigGUI.AddCheckBox("x310 y290 w150 h20 vEnableKnightHeal", "Enable Knight Heal")
+    ConfigGUI.AddText("x310 y315 w80 h20", "Key:")
+    ConfigGUI.AddEdit("x430 y312 w40 h20 vKnightHealKey")
 
     ; Spell Casting Group
-    ConfigGUI.AddGroupBox("x300 y330 w220 h170", "Spell Casting")
-    ConfigGUI.AddCheckBox("x310 y350 w150 h20 vEnableSpellCasting", "Enable Spell Casting")
-    ConfigGUI.AddCheckBox("x310 y375 w200 h20 vEnableSpellCreatureCheck", "Require creatures present")
-    ConfigGUI.AddText("x310 y400 w80 h20", "Warm Key:")
-    ConfigGUI.AddEdit("x430 y397 w40 h20 vWarmSpellKey")
-    ConfigGUI.AddText("x310 y425 w80 h20", "Cast Key:")
-    ConfigGUI.AddEdit("x430 y422 w40 h20 vCastSpellKey")
-    ConfigGUI.AddText("x310 y450 w100 h20", "Delay (ms):")
-    ConfigGUI.AddEdit("x430 y447 w60 h20 vSpellCastingDelay")
-    ConfigGUI.AddText("x310 y475 w100 h20", "Warmed Spell:")
-    ConfigGUI.AddEdit("x385 y472 w30 h20 vWarmedSpellX")
-    ConfigGUI.AddEdit("x420 y472 w30 h20 vWarmedSpellY")
-    ConfigGUI.AddText("x455 y475 w60 h20 cBlue", "Ctrl+Shift+V")
+    ConfigGUI.AddGroupBox("x300 y350 w220 h170", "Spell Casting")
+    ConfigGUI.AddCheckBox("x310 y370 w150 h20 vEnableSpellCasting", "Enable Spell Casting")
+    ConfigGUI.AddCheckBox("x310 y395 w200 h20 vEnableSpellCreatureCheck", "Require creatures present")
+    ConfigGUI.AddText("x310 y420 w80 h20", "Warm Key:")
+    ConfigGUI.AddEdit("x430 y417 w40 h20 vWarmSpellKey")
+    ConfigGUI.AddText("x310 y445 w80 h20", "Cast Key:")
+    ConfigGUI.AddEdit("x430 y442 w40 h20 vCastSpellKey")
+    ConfigGUI.AddText("x310 y470 w100 h20", "Delay (ms):")
+    ConfigGUI.AddEdit("x430 y467 w60 h20 vSpellCastingDelay")
+    ConfigGUI.AddText("x310 y495 w100 h20", "Warmed Spell:")
+    ConfigGUI.AddEdit("x385 y492 w30 h20 vWarmedSpellX")
+    ConfigGUI.AddEdit("x420 y492 w30 h20 vWarmedSpellY")
+    ConfigGUI.AddText("x455 y495 w60 h20 cBlue", "Ctrl+Shift+V")
     
 }
 
@@ -3130,7 +3205,7 @@ CreateHotkeysTab() {
     ConfigGUI.AddGroupBox("x20 y215 w540 h110", "Combat Toggles")
     ConfigGUI.AddText("x30 y240 w400 h20", "Ctrl+Shift+S - Toggle second attack key")
     ConfigGUI.AddText("x30 y270 w400 h20", "Ctrl+Shift+E - Swap attack keys")
-    ConfigGUI.AddText("x30 y300 w400 h20", "Ctrl+Shift+T - Toggle MA mode (fists/restock)")
+    ConfigGUI.AddText("x30 y300 w400 h20", "Ctrl+Shift+T - Toggle MA mode (fists/restock/auto)")
     
     ; Note about hotkey customization
     ConfigGUI.AddText("x20 y335 w540 h20", "Note: Hotkeys are hardcoded and cannot be customized through the GUI.")
@@ -3251,7 +3326,7 @@ LoadProfileToGUI() {
     global ConfigGUI, CurrentProfile, ProfileDropdown
     global HealthAreaX, HealthAreaY, ManaAreaX, ManaAreaY, CreatureAreaX, CreatureAreaY
     global LoginButtonX, LoginButtonY, DrinkKey, AttackKey1, AttackKey2, EnableAttackKey2
-    global EnableMASkill, CurrentMASkill, MAFistsKey, MARestockKey, EnableKnightHeal, KnightHealKey
+    global EnableMASkill, CurrentMASkill, MAFistsKey, MARestockKey, PotionsPerRestock, UsedPotionsCount, EnableKnightHeal, KnightHealKey
     global EnableActiveSpellScrolling, ActiveSpellsLeftX, ActiveSpellsLeftY, ActiveSpellsRightX, ActiveSpellsRightY
     global ActiveSpellGoneX, ActiveSpellGoneY, EnableSpellCasting, SpellCastingDelay, EnableSpellCreatureCheck, WarmSpellKey, CastSpellKey, WarmedSpellX, WarmedSpellY
     global RecoverFumbleMain, RecoverFumbleOffhand, RecoverMainKey, RecoverOffhandKey
@@ -3324,17 +3399,25 @@ LoadProfileToGUI() {
         if (CurrentMASkill = "fists") {
             ConfigGUI["MAFistsMode"].Value := 1
             ConfigGUI["MARestockMode"].Value := 0
+            ConfigGUI["MAAutoMode"].Value := 0
         } else if (CurrentMASkill = "restock") {
             ConfigGUI["MAFistsMode"].Value := 0
             ConfigGUI["MARestockMode"].Value := 1
+            ConfigGUI["MAAutoMode"].Value := 0
+        } else if (CurrentMASkill = "auto") {
+            ConfigGUI["MAFistsMode"].Value := 0
+            ConfigGUI["MARestockMode"].Value := 0
+            ConfigGUI["MAAutoMode"].Value := 1
         } else {
-            ; Default to restock if neither is set
+            ; Default to restock if none is set
             ConfigGUI["MAFistsMode"].Value := 0
             ConfigGUI["MARestockMode"].Value := 1
+            ConfigGUI["MAAutoMode"].Value := 0
         }
         
         ConfigGUI["MAFistsKey"].Text := MAFistsKey
         ConfigGUI["MARestockKey"].Text := MARestockKey
+        ConfigGUI["PotionsPerRestock"].Text := PotionsPerRestock
         ConfigGUI["EnableKnightHeal"].Value := EnableKnightHeal ? 1 : 0
         ConfigGUI["KnightHealKey"].Text := KnightHealKey
         
@@ -3541,10 +3624,13 @@ SaveKeysTabSettings(*) {
             CurrentMASkill := "fists"
         } else if (ConfigGUI["MARestockMode"].Value = 1) {
             CurrentMASkill := "restock"
+        } else if (ConfigGUI["MAAutoMode"].Value = 1) {
+            CurrentMASkill := "auto"
         }
         
         MAFistsKey := ConfigGUI["MAFistsKey"].Text
         MARestockKey := ConfigGUI["MARestockKey"].Text
+        PotionsPerRestock := ConfigGUI["PotionsPerRestock"].Text
         EnableKnightHeal := ConfigGUI["EnableKnightHeal"].Value = 1
         KnightHealKey := ConfigGUI["KnightHealKey"].Text
         EnableSpellCasting := ConfigGUI["EnableSpellCasting"].Value = 1
@@ -3703,9 +3789,10 @@ OnMAFistsModeChange(Ctrl, *) {
     }
     
     try {
-        ; If Fists mode is checked, uncheck Restock mode
+        ; If Fists mode is checked, uncheck Restock and Auto modes
         if (Ctrl.Value = 1) {
             ConfigGUI["MARestockMode"].Value := 0
+            ConfigGUI["MAAutoMode"].Value := 0
         }
     } catch Error as e {
         LogMessage("Error in OnMAFistsModeChange: " . e.Message)
@@ -3720,12 +3807,31 @@ OnMARestockModeChange(Ctrl, *) {
     }
     
     try {
-        ; If Restock mode is checked, uncheck Fists mode
+        ; If Restock mode is checked, uncheck Fists and Auto modes
         if (Ctrl.Value = 1) {
             ConfigGUI["MAFistsMode"].Value := 0
+            ConfigGUI["MAAutoMode"].Value := 0
         }
     } catch Error as e {
         LogMessage("Error in OnMARestockModeChange: " . e.Message)
+    }
+}
+
+OnMAAutoModeChange(Ctrl, *) {
+    global ConfigGUI
+    
+    if (!ConfigGUI || !ConfigGUI.Hwnd) {
+        return
+    }
+    
+    try {
+        ; If Auto mode is checked, uncheck Fists and Restock modes
+        if (Ctrl.Value = 1) {
+            ConfigGUI["MAFistsMode"].Value := 0
+            ConfigGUI["MARestockMode"].Value := 0
+        }
+    } catch Error as e {
+        LogMessage("Error in OnMAAutoModeChange: " . e.Message)
     }
 }
 
