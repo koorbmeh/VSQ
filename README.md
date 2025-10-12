@@ -290,6 +290,8 @@ BackupConfigOnly=false      ; true = config only, false = script + config
 #### **Coordinate Issues**
 - **Coordinates showing as (0,0):** Use hotkeys like `Ctrl+Shift+H` to set coordinates
 - **Wrong coordinates captured:** Re-set coordinates using the appropriate hotkeys
+- **Negative coordinates:** Usually indicates GUI or other window interference - close the Configuration GUI and use hotkeys directly in the game window
+- **Multi-monitor coordinate problems:** If you have the GUI open on a different monitor, close it and use hotkeys in the game window to avoid coordinate conflicts
 - **Coordinates not working after moving window:** VSQ uses absolute coordinates - they should work across monitors
 - **Multi-monitor problems:** Coordinates are screen-absolute, should work on any monitor
 - **Clicking in wrong location:** Verify coordinates are set on actual UI elements, not empty space
