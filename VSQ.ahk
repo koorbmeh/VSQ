@@ -2,7 +2,7 @@
 ; Download here: https://www.autohotkey.com/download/ahk-v2.exe
 
 ; ========================================
-; VSQ.ahk - Vyris's Stormhalter QoL Improvement Mod
+; VSQ.ahk - Vyris's Stormhalter QoL Improvement Mod - v1.2.0
 ; ========================================
 ; All user-configurable settings are in VSQ_Config.ini
 ; The VSQ_Config.ini is created after running the script the first time.
@@ -2659,12 +2659,13 @@ MButton::{
 
 ; Ctrl+Shift+T - Toggle CurrentMASkill between fists, restock, and auto
 ^+t::{
-    global CurrentMASkill, CurrentProfile, GUIOpen, ConfigGUI
+    global CurrentMASkill, CurrentProfile, GUIOpen, ConfigGUI, UsedPotionsCount
     
     if (CurrentMASkill = "fists") {
         CurrentMASkill := "restock"
     } else if (CurrentMASkill = "restock") {
         CurrentMASkill := "auto"
+        UsedPotionsCount := 0  ; Reset potion counter when switching to Auto mode
     } else {
         CurrentMASkill := "fists"
     }
