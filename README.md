@@ -164,10 +164,10 @@ The new **MA Auto Mode** provides intelligent potion management for Martial Arts
 
 ### **How It Works:**
 1. **Tracks Potion Usage** - Counts each healing potion consumed via DrinkKey (only when Auto Fight is active)
-2. **Smart Restocking** - Only restocks when you've used enough potions to justify the restock
-3. **Automatic Switching** - Uses Fists when potions are full, Restocks when potions are needed
+2. **Smart Restocking** - Only restocks when you've used enough potions to justify the restock (applies to both Restock and Auto modes)
+3. **Automatic Switching** - Uses Fists when potions are full, Restocks when potions are needed (Auto mode only)
 4. **Potion Warning** - Alerts you when using potions faster than you can restock them
-5. **Counter Reset** - Switching to Auto mode (Ctrl+Shift+T) resets the potion counter to 0 for a fresh start
+5. **Counter Reset** - Switching to Restock or Auto mode (Ctrl+Shift+T) resets the potion counter to 0 for a fresh start
 
 ### **Configuration:**
 - **Set Potions per Restock** (1-3) in Configuration GUI → Keys tab → MA Skills group

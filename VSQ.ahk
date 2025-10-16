@@ -2,7 +2,7 @@
 ; Download here: https://www.autohotkey.com/download/ahk-v2.exe
 
 ; ========================================
-; VSQ.ahk - Vyris's Stormhalter QoL Improvement Mod - v1.2.0
+; VSQ.ahk - Vyris's Stormhalter QoL Improvement Mod - v1.3.0
 ; ========================================
 ; All user-configurable settings are in VSQ_Config.ini
 ; The VSQ_Config.ini is created after running the script the first time.
@@ -1645,8 +1645,8 @@ ExecuteAction(action) {
                 }
             } else if (DrinkKey != "") {
                 SendKey(DrinkKey)
-                ; Track drink usage for MA Auto mode (only if MA Skills are enabled)
-                if (EnableMASkill && CurrentMASkill = "auto") {
+                ; Track drink usage for MA Auto and Restock modes (only if MA Skills are enabled)
+                if (EnableMASkill && (CurrentMASkill = "auto" || CurrentMASkill = "restock")) {
                     UsedPotionsCount++
                     LogMessage("Auto: Used potion #" . UsedPotionsCount . " (total used: " . UsedPotionsCount . "/" . PotionsPerRestock . ")")
                     
@@ -1675,27 +1675,55 @@ ExecuteAction(action) {
                 }
                 LogMessage("Auto: Executed MA Fists action")
             } else if (CurrentMASkill = "restock") {
-                ; Send MARestockKey (always, regardless of creatures)
-                if (MARestockKey != "") {
-                    SendKey(MARestockKey)
+                ; Restock mode: only restock if we've used enough potions
+                if (UsedPotionsCount >= PotionsPerRestock) {
+                    ; We've used potions, restock to replace them
+                    if (MARestockKey != "") {
+                        SendKey(MARestockKey)
+                    }
+                    
+                    ; Reduce the used potions count by the amount restocked
+                    UsedPotionsCount := UsedPotionsCount - PotionsPerRestock
+                    LogMessage("Auto: MA Restock mode - Restocking to replace " . PotionsPerRestock . " potions (remaining used: " . UsedPotionsCount . ")")
+                    
+                    ; Check if AttackSpamReduction is enabled and creatures are present before attacking
+                    if (AttackSpamReduction && !CheckCreatures()) {
+                        LogMessage("Auto: No creatures detected - skipping MA Restock attacks")
+                        return
+                    }
+                    
+                    ; Send AttackKey1 and AttackKey2 (if enabled)
+                    if (AttackKey1 != "") {
+                        Sleep(ShortDelay)  ; Delay between keys
+                        SendKey(AttackKey1)
+                    }
+                    if (EnableAttackKey2 && AttackKey2 != "") {
+                        Sleep(ShortDelay)  ; Delay between keys
+                        SendKey(AttackKey2)
+                    }
+                    LogMessage("Auto: Executed MA Restock action")
+                } else {
+                    ; No potions used, skip restock to avoid "not enough room" errors
+                    LogMessage("Auto: MA Restock mode - Skipping restock (only " . UsedPotionsCount . " potions used, need " . PotionsPerRestock . ")")
+                    
+                    ; Still attack even if we're not restocking
+                    ; Check if AttackSpamReduction is enabled and creatures are present before attacking
+                    if (AttackSpamReduction && !CheckCreatures()) {
+                        LogMessage("Auto: No creatures detected - skipping MA Restock attacks")
+                        return
+                    }
+                    
+                    ; Send AttackKey1 and AttackKey2 (if enabled)
+                    if (AttackKey1 != "") {
+                        Sleep(ShortDelay)  ; Delay between keys
+                        SendKey(AttackKey1)
+                    }
+                    if (EnableAttackKey2 && AttackKey2 != "") {
+                        Sleep(ShortDelay)  ; Delay between keys
+                        SendKey(AttackKey2)
+                    }
+                    LogMessage("Auto: Executed MA Restock attacks (no restock needed)")
                 }
-                
-                ; Check if AttackSpamReduction is enabled and creatures are present before attacking
-                if (AttackSpamReduction && !CheckCreatures()) {
-                    LogMessage("Auto: No creatures detected - skipping MA Restock attacks")
-                    return
-                }
-                
-                ; Send AttackKey1 and AttackKey2 (if enabled)
-                if (AttackKey1 != "") {
-                    Sleep(ShortDelay)  ; Delay between keys
-                    SendKey(AttackKey1)
-                }
-                if (EnableAttackKey2 && AttackKey2 != "") {
-                    Sleep(ShortDelay)  ; Delay between keys
-                    SendKey(AttackKey2)
-                }
-                LogMessage("Auto: Executed MA Restock action")
             } else if (CurrentMASkill = "auto") {
                 ; Auto mode: restock if we've used enough potions, otherwise do fists
                 if (UsedPotionsCount >= PotionsPerRestock) {
@@ -2663,6 +2691,7 @@ MButton::{
     
     if (CurrentMASkill = "fists") {
         CurrentMASkill := "restock"
+        UsedPotionsCount := 0  ; Reset potion counter when switching to Restock mode
     } else if (CurrentMASkill = "restock") {
         CurrentMASkill := "auto"
         UsedPotionsCount := 0  ; Reset potion counter when switching to Auto mode
