@@ -2,7 +2,7 @@
 ; Download here: https://www.autohotkey.com/download/ahk-v2.exe
 
 ; ========================================
-; VSQ.ahk - Vyris's Stormhalter QoL Improvement Mod - v1.3.0
+; VSQ.ahk - Vyris's Stormhalter QoL Improvement Mod - v1.3.1
 ; ========================================
 ; All user-configurable settings are in VSQ_Config.ini
 ; The VSQ_Config.ini is created after running the script the first time.
@@ -1769,6 +1769,28 @@ ExecuteAction(action) {
                     }
                     LogMessage("Auto: Executed MA Auto Fists action")
                 }
+            } else if (CurrentMASkill = "refill") {
+                ; Refill mode: always restock (like old restock mode behavior)
+                if (MARestockKey != "") {
+                    SendKey(MARestockKey)
+                }
+                
+                ; Check if AttackSpamReduction is enabled and creatures are present before attacking
+                if (AttackSpamReduction && !CheckCreatures()) {
+                    LogMessage("Auto: No creatures detected - skipping MA Refill attacks")
+                    return
+                }
+                
+                ; Send AttackKey1 and AttackKey2 (if enabled)
+                if (AttackKey1 != "") {
+                    Sleep(ShortDelay)  ; Delay between keys
+                    SendKey(AttackKey1)
+                }
+                if (EnableAttackKey2 && AttackKey2 != "") {
+                    Sleep(ShortDelay)  ; Delay between keys
+                    SendKey(AttackKey2)
+                }
+                LogMessage("Auto: Executed MA Refill action")
             }
         case "CAST":
             ; Check if spell is warmed using the CheckWarmed function
@@ -2685,7 +2707,7 @@ MButton::{
     LogMessage("MA Skill " . status . " for profile " . CurrentProfile . " - " . GetProfileName(CurrentProfile))
 }
 
-; Ctrl+Shift+T - Toggle CurrentMASkill between fists, restock, and auto
+; Ctrl+Shift+T - Toggle CurrentMASkill between fists, restock, auto, and refill
 ^+t::{
     global CurrentMASkill, CurrentProfile, GUIOpen, ConfigGUI, UsedPotionsCount
     
@@ -2695,6 +2717,9 @@ MButton::{
     } else if (CurrentMASkill = "restock") {
         CurrentMASkill := "auto"
         UsedPotionsCount := 0  ; Reset potion counter when switching to Auto mode
+    } else if (CurrentMASkill = "auto") {
+        CurrentMASkill := "refill"
+        UsedPotionsCount := 0  ; Reset potion counter when switching to Refill mode
     } else {
         CurrentMASkill := "fists"
     }
@@ -2709,14 +2734,22 @@ MButton::{
                 ConfigGUI["MAFistsMode"].Value := 1
                 ConfigGUI["MARestockMode"].Value := 0
                 ConfigGUI["MAAutoMode"].Value := 0
+                ConfigGUI["MARefillMode"].Value := 0
             } else if (CurrentMASkill = "restock") {
                 ConfigGUI["MAFistsMode"].Value := 0
                 ConfigGUI["MARestockMode"].Value := 1
                 ConfigGUI["MAAutoMode"].Value := 0
+                ConfigGUI["MARefillMode"].Value := 0
             } else if (CurrentMASkill = "auto") {
                 ConfigGUI["MAFistsMode"].Value := 0
                 ConfigGUI["MARestockMode"].Value := 0
                 ConfigGUI["MAAutoMode"].Value := 1
+                ConfigGUI["MARefillMode"].Value := 0
+            } else if (CurrentMASkill = "refill") {
+                ConfigGUI["MAFistsMode"].Value := 0
+                ConfigGUI["MARestockMode"].Value := 0
+                ConfigGUI["MAAutoMode"].Value := 0
+                ConfigGUI["MARefillMode"].Value := 1
             }
         } catch Error as e {
             LogMessage("Error updating GUI MA mode: " . e.Message)
@@ -3109,7 +3142,8 @@ CreateKeysTab() {
     ConfigGUI.AddText("x310 y135 w80 h20", "Mode:")
     ConfigGUI.AddCheckBox("x310 y155 w43 h20 vMAFistsMode", "Fists").OnEvent("Click", OnMAFistsModeChange)
     ConfigGUI.AddCheckBox("x355 y155 w60 h20 vMARestockMode", "Restock").OnEvent("Click", OnMARestockModeChange)
-    ConfigGUI.AddCheckBox("x420 y155 w50 h20 vMAAutoMode", "Auto").OnEvent("Click", OnMAAutoModeChange)
+    ConfigGUI.AddCheckBox("x420 y155 w40 h20 vMAAutoMode", "Auto").OnEvent("Click", OnMAAutoModeChange)
+    ConfigGUI.AddCheckBox("x462 y155 w50 h20 vMARefillMode", "Refill").OnEvent("Click", OnMARefillModeChange)
     
     ConfigGUI.AddText("x310 y180 w100 h20", "MA Fists Key:")
     ConfigGUI.AddEdit("x430 y177 w40 h20 vMAFistsKey")
@@ -3235,7 +3269,7 @@ CreateHotkeysTab() {
     ConfigGUI.AddGroupBox("x20 y215 w540 h110", "Combat Toggles")
     ConfigGUI.AddText("x30 y240 w400 h20", "Ctrl+Shift+S - Toggle second attack key")
     ConfigGUI.AddText("x30 y270 w400 h20", "Ctrl+Shift+E - Swap attack keys")
-    ConfigGUI.AddText("x30 y300 w400 h20", "Ctrl+Shift+T - Toggle MA mode (fists/restock/auto)")
+    ConfigGUI.AddText("x30 y300 w400 h20", "Ctrl+Shift+T - Toggle MA mode (fists/restock/auto/refill)")
     
     ; Note about hotkey customization
     ConfigGUI.AddText("x20 y335 w540 h20", "Note: Hotkeys are hardcoded and cannot be customized through the GUI.")
@@ -3430,19 +3464,28 @@ LoadProfileToGUI() {
             ConfigGUI["MAFistsMode"].Value := 1
             ConfigGUI["MARestockMode"].Value := 0
             ConfigGUI["MAAutoMode"].Value := 0
+            ConfigGUI["MARefillMode"].Value := 0
         } else if (CurrentMASkill = "restock") {
             ConfigGUI["MAFistsMode"].Value := 0
             ConfigGUI["MARestockMode"].Value := 1
             ConfigGUI["MAAutoMode"].Value := 0
+            ConfigGUI["MARefillMode"].Value := 0
         } else if (CurrentMASkill = "auto") {
             ConfigGUI["MAFistsMode"].Value := 0
             ConfigGUI["MARestockMode"].Value := 0
             ConfigGUI["MAAutoMode"].Value := 1
+            ConfigGUI["MARefillMode"].Value := 0
+        } else if (CurrentMASkill = "refill") {
+            ConfigGUI["MAFistsMode"].Value := 0
+            ConfigGUI["MARestockMode"].Value := 0
+            ConfigGUI["MAAutoMode"].Value := 0
+            ConfigGUI["MARefillMode"].Value := 1
         } else {
             ; Default to restock if none is set
             ConfigGUI["MAFistsMode"].Value := 0
             ConfigGUI["MARestockMode"].Value := 1
             ConfigGUI["MAAutoMode"].Value := 0
+            ConfigGUI["MARefillMode"].Value := 0
         }
         
         ConfigGUI["MAFistsKey"].Text := MAFistsKey
@@ -3656,6 +3699,8 @@ SaveKeysTabSettings(*) {
             CurrentMASkill := "restock"
         } else if (ConfigGUI["MAAutoMode"].Value = 1) {
             CurrentMASkill := "auto"
+        } else if (ConfigGUI["MARefillMode"].Value = 1) {
+            CurrentMASkill := "refill"
         }
         
         MAFistsKey := ConfigGUI["MAFistsKey"].Text
@@ -3819,10 +3864,11 @@ OnMAFistsModeChange(Ctrl, *) {
     }
     
     try {
-        ; If Fists mode is checked, uncheck Restock and Auto modes
+        ; If Fists mode is checked, uncheck Restock, Auto, and Refill modes
         if (Ctrl.Value = 1) {
             ConfigGUI["MARestockMode"].Value := 0
             ConfigGUI["MAAutoMode"].Value := 0
+            ConfigGUI["MARefillMode"].Value := 0
         }
     } catch Error as e {
         LogMessage("Error in OnMAFistsModeChange: " . e.Message)
@@ -3837,10 +3883,11 @@ OnMARestockModeChange(Ctrl, *) {
     }
     
     try {
-        ; If Restock mode is checked, uncheck Fists and Auto modes
+        ; If Restock mode is checked, uncheck Fists, Auto, and Refill modes
         if (Ctrl.Value = 1) {
             ConfigGUI["MAFistsMode"].Value := 0
             ConfigGUI["MAAutoMode"].Value := 0
+            ConfigGUI["MARefillMode"].Value := 0
         }
     } catch Error as e {
         LogMessage("Error in OnMARestockModeChange: " . e.Message)
@@ -3855,13 +3902,33 @@ OnMAAutoModeChange(Ctrl, *) {
     }
     
     try {
-        ; If Auto mode is checked, uncheck Fists and Restock modes
+        ; If Auto mode is checked, uncheck Fists, Restock, and Refill modes
         if (Ctrl.Value = 1) {
             ConfigGUI["MAFistsMode"].Value := 0
             ConfigGUI["MARestockMode"].Value := 0
+            ConfigGUI["MARefillMode"].Value := 0
         }
     } catch Error as e {
         LogMessage("Error in OnMAAutoModeChange: " . e.Message)
+    }
+}
+
+OnMARefillModeChange(Ctrl, *) {
+    global ConfigGUI
+    
+    if (!ConfigGUI || !ConfigGUI.Hwnd) {
+        return
+    }
+    
+    try {
+        ; If Refill mode is checked, uncheck Fists, Restock, and Auto modes
+        if (Ctrl.Value = 1) {
+            ConfigGUI["MAFistsMode"].Value := 0
+            ConfigGUI["MARestockMode"].Value := 0
+            ConfigGUI["MAAutoMode"].Value := 0
+        }
+    } catch Error as e {
+        LogMessage("Error in OnMARefillModeChange: " . e.Message)
     }
 }
 

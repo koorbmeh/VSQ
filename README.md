@@ -23,7 +23,7 @@
 - **Smart Combat** - Triggers attacks when creatures detected
 - **Fumble Recovery** - Auto-recovers fumbled weapons (main hand/offhand)
 - **Spell Casting** - Auto-warms and casts spells based on mana
-- **MA Skills** - Martial Arts automation (fists/restock/auto modes)
+- **MA Skills** - Martial Arts automation (fists/restock/auto/refill modes)
 - **Knight Heal** - Mana-based healing
 - **Coin Pickup** - One-click banker ring use
 - **Active Spell Scrolling** - Auto-scrolls active spells left/right
@@ -67,7 +67,7 @@
 | **Ctrl+Shift+S** | Toggle second attack |
 | **Ctrl+Shift+E** | Swap attack keys |
 | **Ctrl+Shift+A** | Toggle MA Skills |
-| **Ctrl+Shift+T** | Toggle MA mode (fists/restock/auto) |
+| **Ctrl+Shift+T** | Toggle MA mode (fists/restock/auto/refill) |
 | **Ctrl+Shift+K** | Toggle Knight Heal |
 | **Ctrl+Shift+Z** | Toggle Active Spell Scrolling |
 | **Ctrl+Shift+X** | Toggle Spell Casting |
@@ -149,7 +149,7 @@
 - **Pixel Detection** - Color analysis for health/mana/creatures/spells
 - **Fumble Recovery** - Auto-recovers fumbled weapons using dark pixel detection
 - **Spell Casting** - Auto-warms and casts spells based on mana and spell state
-- **MA Skills** - Fists mode (fists + attack), Restock mode (restock + attacks), or Auto mode (intelligent switching between fists and restock)
+- **MA Skills** - Fists mode (fists + attack), Restock mode (smart restock + attacks), Auto mode (intelligent switching), or Refill mode (always restock + attacks)
 - **Coin Pickup** - 8x8 grid scanning with precise timing
 - **Active Spells** - Auto-scrolls based on color detection, respects user clicks (2s cooldown)
 - **Creature Detection** - Prevents spam when no enemies present
@@ -174,6 +174,20 @@ The new **MA Auto Mode** provides intelligent potion management for Martial Arts
 - **Enable Auto Mode** via checkbox or Ctrl+Shift+T hotkey
 - **Configure MA Keys** - Set your Fists and Restock command keys
 - **Activate Auto Fight** - Press Middle Mouse Button to enable the automation system
+
+## 🥊 MA Refill Mode - Always Restock
+
+The **MA Refill Mode** provides the original "always restock" behavior
+
+### **How It Works:**
+- **Always Restocks** - Every time MA skill is triggered, it performs a restock action
+- **No Potion Counting** - Ignores potion usage tracking completely
+- **Immediate Action** - No delays or conditions, always executes restock + attacks
+
+### **When to Use:**
+- **Initial Bag Filling** - Perfect for refilling your bag with potions when starting with an empty bag
+
+**💡 Pro Tip:** Use Refill mode when your bag is empty to quickly fill it with potions, then switch to Restock or Auto mode for smart potion management during combat.
 
 ## 🖥️ Configuration GUI
 
@@ -209,7 +223,7 @@ VSQ includes a comprehensive GUI for easy configuration:
 
 **Keys Tab:**
 - Attack key configuration (primary/secondary)
-- MA skills settings (fists/restock/auto modes with potion tracking)
+- MA skills settings (fists/restock/auto/refill modes with potion tracking)
 - Knight heal configuration
 - Spell casting keys (warm/cast)
 - Fumble recovery keys (main hand/offhand)
