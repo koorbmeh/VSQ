@@ -73,6 +73,7 @@
 | **Ctrl+Shift+X** | Toggle Spell Casting |
 | **Ctrl+Shift+B** | Toggle Main Hand Fumble Recovery |
 | **Ctrl+Shift+Y** | Toggle Offhand Fumble Recovery |
+| **Ctrl+Shift+P** | Toggle Creature list verification (on/off) |
 
 
 ## 🎯 How to Use
@@ -195,7 +196,6 @@ VSQ includes a comprehensive GUI for easy configuration:
 
 ### **Opening the GUI:**
 - Press `Ctrl+Shift+~` to open the Configuration GUI
-- Or use the menu: File → Configuration
 
 ### **GUI Features:**
 - **Profile Management** - Switch between profiles and rename them
@@ -223,7 +223,7 @@ VSQ includes a comprehensive GUI for easy configuration:
 
 **Keys Tab:**
 - Attack key configuration (primary/secondary)
-- MA skills settings (fists/restock/auto/refill modes with potion tracking)
+- MA skills settings (fists/restock/auto/refill modes - auto/restock use potion tracking)
 - Knight heal configuration
 - Spell casting keys (warm/cast)
 - Fumble recovery keys (main hand/offhand)
