@@ -176,6 +176,8 @@ The new **MA Auto Mode** provides intelligent potion management for Martial Arts
 - **Configure MA Keys** - Set your Fists and Restock command keys
 - **Activate Auto Fight** - Press Middle Mouse Button to enable the automation system
 
+**🥊 Threestaff Strategy:** Restock mode is ideal for Threestaff users because you cannot use Fists with a Threestaff. Since Fists mode is not an option, Restock mode's smart potion counting ensures you maintain optimal potion levels without over-restocking, making it the perfect choice for Threestaff combat.
+
 ## 🥊 MA Refill Mode - Always Restock
 
 The **MA Refill Mode** provides the original "always restock" behavior
